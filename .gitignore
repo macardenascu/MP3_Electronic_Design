@@ -26,8 +26,12 @@
 *.bin
 *.elf
 *.map
+*.hex
+*.uf2
 *.pyc
 __pycache__/
+.cache/
+.pytest_cache/
 *.tmp
 *.temp
 *.swp

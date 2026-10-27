@@ -1,56 +1,45 @@
-﻿# Reproductor de audio sin distracciones
+# Reproductor portátil de música local
 
-Proyecto universitario individual para diseñar un reproductor portátil de música local, centrado en escuchar una biblioteca propia sin internet, streaming ni dependencia de un teléfono. El objetivo es ofrecer reproducción directa desde microSD y una interacción física sencilla, reduciendo interrupciones y funciones ajenas a la escucha.
+Proyecto universitario para diseñar un reproductor portátil que permita escuchar una biblioteca propia sin internet, streaming ni dependencia de un teléfono. La prioridad es una reproducción local fiable y una interacción física sencilla.
 
-## Objetivo y alcance
+## Objetivos y funciones previstas
 
-El producto previsto reproducirá archivos locales desde una tarjeta microSD. La experiencia propuesta usa botones físicos, una pantalla OLED y salida por jack de 3,5 mm. La reproducción MP3 en el dispositivo final es un requisito del producto, pero todavía no está implementada ni validada.
+El producto deberá explorar una tarjeta microSD, organizar y reproducir archivos de música, mostrar información básica y permitir el control desde botones. También se evalúan acceso USB a la tarjeta y conectividad Bluetooth. Estas son metas de diseño; no se presentan como funciones ya disponibles.
 
 ## Arquitectura objetivo
 
-La arquitectura de referencia actualmente propuesta es:
+| Área | Selección o propuesta actual | Estado |
+|---|---|---|
+| Procesamiento | ESP32-S3-WROOM-1-N16R8 | Seleccionado para el diseño objetivo; integración pendiente |
+| Audio | ES8388 por I²S y jack de 3,5 mm | Propuesto; sin validación física |
+| Almacenamiento | microSD por SPI, prevista con FAT32 | Propuesto; el montaje de la PoC usa otra interfaz |
+| Interfaz | OLED SSD1306 y cinco botones físicos | Propuesta; sin implementación |
+| Alimentación | Li-Po, MCP73871 y TPS63802 | Selección conceptual; presupuesto y circuito pendientes |
+| USB | USB-C con USB MSC previsto | Requisito por validar e implementar |
+| Bluetooth | BM83 | Sujeto a una PoC y validación adicionales |
 
-- **Procesamiento:** módulo ESP32-S3-WROOM-1-N16R8.
-- **Audio:** códec ES8388 conectado mediante I²S y salida analógica a jack de 3,5 mm.
-- **Biblioteca:** microSDHC con sistema FAT32, conectada por SPI.
-- **Interfaz:** OLED SSD1306 y cinco botones físicos.
-- **Alimentación:** batería Li-Po, cargador/gestor MCP73871 y convertidor TPS63802.
-- **USB:** conector USB-C; se contempla USB MSC para acceso a la tarjeta.
-- **Bluetooth:** módulo BM83 como función condicionada al resultado de una prueba de concepto específica.
+La ESP32-S31-Korvo-1 se usa únicamente como plataforma temporal de prueba de concepto. No es el hardware final: su SoC, códec ES8389 y montaje SDMMC difieren de la arquitectura ESP32-S3, ES8388 y microSD SPI propuesta. Los resultados de compilación de la PoC no validan la electrónica final.
 
-Estos elementos describen la arquitectura de producto propuesta. Aún deben verificarse interfaces, presupuesto eléctrico, selección de componentes y detalles de diseño. No hay evidencia aquí de una PCB fabricada ni de un prototipo físico funcional.
+## Estado
 
-## Estado de desarrollo y evidencia
+La etapa actual implementa el montaje solicitado de SD en la Korvo y el inventario ordenado de archivos `.mp3` en `MUSIC`. La lógica del catálogo tiene pruebas host y el firmware cuenta con evidencia de compilación para ESP32-S31. No hay todavía validación en una placa física ni reproducción de audio. MP3, PCM y WAV, pantalla, botones, USB MSC y Bluetooth no están implementados.
 
-La primera etapa de firmware se desarrolló para la placa ESP32-S31-Korvo-1 de Espressif con ESP-IDF 6.1 y BSP 1.0.1. Esa plataforma es una herramienta temporal para validar parcialmente el flujo de almacenamiento; no representa el hardware final.
+Consulte el [estado técnico y la evidencia de la PoC](poc/esp32-s31-korvo-1/docs/POC_STATUS.md) y las [instrucciones para compilarla](poc/esp32-s31-korvo-1/README.md).
 
-La PoC actual monta la microSD a través del BSP y explora el directorio `MUSIC` para formar un catálogo ordenado de nombres `.mp3`. La lógica del catálogo tiene pruebas host. El firmware compiló para el target preliminar ESP32-S31. **La compilación y las pruebas host no verifican el montaje de la tarjeta en la placa.** La placa física y el hardware final aún requieren validación.
+## Organización del repositorio
 
-No hay todavía reproducción MP3, PCM o WAV, ni una demostración de audio operativo. USB MSC, pantalla, controles y Bluetooth tampoco están implementados en esta etapa.
+- `poc/esp32-s31-korvo-1/`: proyecto ESP-IDF independiente de la placa Korvo, sus pruebas host, herramientas y documentación.
+- El hardware propio y el firmware definitivo aún no tienen artefactos versionados. Se incorporarán cuando existan diseños y código verificables, manteniéndolos separados de esta PoC.
+- Las herramientas de validación actualmente viven junto a la PoC que las usa; no hay una colección de herramientas generales independiente.
 
-### Clasificación de decisiones y evidencia
+## Próximos hitos
 
-- **Requisitos del producto:** música local desde microSD, uso sin internet ni teléfono y manejo físico directo.
-- **Decisiones de diseño propuestas:** ESP32-S3, ES8388/I²S, microSDHC/SPI, OLED, botones y cadena de alimentación indicada arriba.
-- **Hipótesis pendientes:** compatibilidad e integración eléctrica de la arquitectura, calidad de audio, autonomía, desempeño de USB MSC y utilidad de BM83.
-- **Validado experimentalmente hasta ahora:** pruebas de catálogo en PC y compilación del firmware para ESP32-S31. No se ha validado funcionamiento físico.
+1. Validar físicamente montaje SD y catálogo en la ESP32-S31-Korvo-1.
+2. Definir y probar el camino de audio en la PoC como etapa posterior, sin asumir que sustituye la validación del ES8388 final.
+3. Completar esquemático, interfaces y presupuesto eléctrico del hardware propio y fabricar un prototipo.
+4. Implementar y validar el firmware definitivo sobre la plataforma seleccionada.
+5. Evaluar USB MSC y, por separado, la pertinencia del BM83.
 
-## Organización
+## Licencia
 
-- `poc/esp32-s31-korvo-1/`: firmware, pruebas host, scripts y documentación de la PoC Korvo.
-- `docs/`: documentación general del proyecto cuando existan artefactos revisados y vigentes.
-
-La documentación específica de estado y limitaciones de la PoC está en `poc/esp32-s31-korvo-1/docs/POC_STATUS.md`.
-
-## Próximos hitos técnicos
-
-1. Validar físicamente el montaje SD y el catálogo en ESP32-S31-Korvo-1.
-2. Probar generación y salida PCM en la plataforma de PoC; luego implementar y validar lectura/reproducción WAV PCM.
-3. Evaluar e integrar decodificación MP3 después de establecer el camino PCM/WAV.
-4. Definir y verificar interfaces, alimentación y restricciones del hardware ESP32-S3/ES8388/microSD SPI.
-5. Implementar y probar por separado pantalla, botones, USB MSC y, si la PoC lo justifica, Bluetooth BM83.
-6. Construir y validar el prototipo de hardware final antes de declarar operativo el producto.
-
-## Entorno de la PoC
-
-Consulte `poc/esp32-s31-korvo-1/README.md` para requisitos y comandos de compilación host y ESP-IDF. La prueba de concepto requiere ESP-IDF 6.1 y `--preview` para el target ESP32-S31.
+El proyecto se distribuye bajo GNU GPL versión 3. Consulte el archivo [LICENSE](LICENSE).

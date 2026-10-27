@@ -80,7 +80,11 @@ esp_err_t music_catalog_scan(const char *mount_point, music_catalog_t *catalog)
     }
     if (result == ESP_OK && errno != 0) result = ESP_FAIL;
     if (closedir(dir) != 0 && result == ESP_OK) result = ESP_FAIL;
-    if (result != ESP_OK) { catalog->count = 0; return result; }
+    if (result != ESP_OK) {
+        /* A failed scan never publishes partial or success-only metadata. */
+        memset(catalog, 0, sizeof(*catalog));
+        return result;
+    }
     qsort(catalog->tracks, catalog->count, sizeof(catalog->tracks[0]), name_compare);
     return ESP_OK;
 }

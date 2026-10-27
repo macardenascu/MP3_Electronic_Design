@@ -1,59 +1,65 @@
-# Cierre técnico de la primera etapa
+# Estado de la PoC ESP32-S31-Korvo-1
 
-## Objetivo
+## Alcance
 
-Demostrar el arranque de la aplicación, el montaje de microSD por medio del BSP Korvo y el inventario determinista de archivos `.mp3` en `MUSIC`. Esta etapa no reproduce audio.
+La primera etapa es una PoC de montaje de almacenamiento e inventario de música. Solicita el montaje SD al BSP Korvo y recorre el directorio inmediato `MUSIC` para identificar archivos `.mp3`. No es una prueba de reproducción.
 
-## Plataforma y arquitectura
+La lógica portable está en `music_catalog.c`; `storage_korvo.c` encapsula el BSP y `app_main.c` presenta diagnósticos por consola. El catálogo tiene capacidad fija de 256 nombres de hasta 255 bytes, acepta extensiones ASCII `.mp3` sin distinguir mayúsculas, ignora directorios y otros tipos, comprueba acceso a archivos y ordena por nombre de forma determinista. Ante error descarta toda la salida del escaneo.
 
-- **Placa de PoC:** ESP32-S31-Korvo-1, BSP oficial `espressif/esp32_s31_korvo_1` 1.0.1.
-- **Entorno:** ESP-IDF 6.1, target preliminar `esp32s31` con `--preview`, GCC RISC-V 15.2.0.
-- `app_main.c` gestiona el diagnóstico y llama al adaptador de almacenamiento y al catálogo.
-- `storage_korvo.c` encapsula las llamadas BSP para montar la SD y obtener su punto de montaje.
-- `music_catalog.c` es portable y no depende del BSP. Escanea solo el directorio inmediato `MUSIC`, acepta `.mp3` en cualquier combinación ASCII de mayúsculas, ignora directorios y otros tipos, comprueba que los archivos se puedan abrir/leer y ordena por nombre sin distinguir ASCII mayúsculas, con desempate sensible a mayúsculas.
-- El catálogo tiene capacidad fija de 256 nombres de hasta 255 bytes. Si el recorrido o un acceso falla, el escaneo devuelve error y no publica un catálogo parcial.
+La Korvo 1 utiliza ESP32-S31, códec ES8389 y SDMMC. No valida la arquitectura final propuesta de ESP32-S3-WROOM-1-N16R8, ES8388 por I²S y microSD por SPI.
 
-## Estado por tipo de evidencia
+## Estado por evidencia
 
 ### Implementado
 
-Montaje solicitado al BSP, búsqueda de `MUSIC`, filtro y orden del catálogo, límite de capacidad y mensajes de diagnóstico por UART. Los estados/reproductor y API de audio son solo marcadores; no implementan reproducción.
+- Llamada al montaje SD de BSP y obtención de su punto de montaje.
+- Búsqueda de `MUSIC`, filtrado y ordenamiento de archivos, comprobación de errores y límite fijo de 256 entradas.
+- Mensajes de diagnóstico por UART.
+
+La API de audio y algunos tipos de reproductor en el código son marcadores; no implementan reproducción.
 
 ### Probado en PC
 
-Comando ejecutado desde PowerShell:
+Comando PowerShell ejecutado desde `poc/esp32-s31-korvo-1`:
 
 ```powershell
 $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+New-Item -ItemType Directory -Force build-host | Out-Null
 gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main main/music_catalog.c tests/host/music_catalog_test.c -o build-host/music_catalog_test.exe
-.\build-host\music_catalog_test.exe
+if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación host' }
+& .\build-host\music_catalog_test.exe
+if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas host' }
 ```
 
-Resultado: compilación host limpia con `-Werror` y salida `music_catalog tests passed`. Se verifican `MUSIC` inexistente, archivo en lugar de directorio, carpeta vacía, extensiones mixtas, extensiones ajenas, subdirectorio con sufijo `.mp3`, orden determinista, nombre de 244 bytes, capacidad exacta de 256 y rechazo de la entrada 257 con catálogo parcial descartado.
+La suite debe terminar con `music_catalog tests passed`. Cubre directorio inexistente, `MUSIC` como archivo, directorio vacío, extensiones mixtas, archivos no MP3, subdirectorios, ordenamiento, nombre largo, capacidad exacta de 256 y rechazo de la entrada 257. La regresión de capacidad comprueba que un escaneo fallido no deje `directory_found` activado ni entradas parciales.
 
-La suite no puede verificar de forma portable que el sistema operativo deniegue la lectura de un archivo: Windows puede ejecutar con permisos elevados y `chmod` no ofrece una garantía equivalente. El escáner sí comprueba `stat`, `fopen`, `fread`, `fclose` y errores de recorrido; falta una prueba host fiable de archivo inaccesible. Tampoco se ha probado una extracción de tarjeta durante el escaneo.
+Las pruebas de permisos denegados no son portables cuando el proceso corre con privilegios; tampoco simulan extracción de tarjeta durante un escaneo.
 
 ### Compilado para ESP32-S31
 
-El estado local previo contiene `build_new/audio_player_poc.bin` de 319360 bytes (`0x4df80`), compatible con el resultado informado de 2153/2153 pasos y cerca de 70 % libre en la partición de aplicación. El manifiesto de build identifica ESP-IDF 6.1, target `esp32s31` y el compilador RISC-V GCC 15.2.0. Esta compilación no demuestra funcionamiento en placa.
+La evidencia registrada en la etapa previa incluye:
 
-En esta auditoría, la suite host volvió a compilar y pasar. Se intentó repetir `idf.py --preview -B build_new build`, pero el script de activación falló antes de ejecutar IDF: `esp-clangd` produce `WinError 5 Acceso denegado`; por ello no se obtuvo un build nuevo en esta sesión. El binario existente y el build previo permanecen sin modificaciones. No se ejecutaron flash ni monitor.
+- ESP-IDF 6.1, modo preview, target `esp32s31`, BSP `espressif/esp32_s31_korvo_1` 1.0.1 y GCC RISC-V 15.2.0.
+- Compilación posterior al cambio de nombre del repositorio: 2153/2153 pasos completados.
+- Binario de aplicación de 319360 bytes (`0x4df80`) y aproximadamente 70 % de espacio disponible en la partición de aplicación.
 
-## Pendiente de validación física
+**Verificación realizada en esta auditoría:** las pruebas host se recompilaron y pasaron, incluida la nueva regresión de salida limpia ante error. No se pudo iniciar un build ESP-IDF nuevo: la activación falló antes de CMake porque `idf_tools.py` no pudo acceder a `esp-clangd` (`WinError 5: Acceso denegado`). También se intentó invocar Ninja directamente sobre un build previo; CMake no pudo regenerarlo porque el entorno `IDF_PATH` no estaba activo. No se modificaron instalaciones globales ni se intentó instalar herramientas. El binario local previamente generado y su evidencia histórica no se alteraron. No se ejecutaron flash ni monitor.
 
-- Montaje FAT32 en la Korvo 1 y ruta real que entrega el BSP.
-- Acceso real a archivos/nombres largos y listado UART.
-- Errores de montaje, tarjeta ausente o extracción durante el acceso.
-- El hardware final ESP32-S3 + ES8388 + microSD SPI requiere validación separada; la Korvo usa ESP32-S31, ES8389 y SDMMC.
+Históricamente, una auditoría anterior tampoco pudo activar ESP-IDF por el error de acceso a `esp-clangd`. Posteriormente sí se obtuvieron compilaciones satisfactorias desde PowerShell, incluida la compilación de 2153/2153 pasos posterior al cambio de nombre del repositorio. En esta auditoría reapareció el bloqueo de activación; por eso el resultado histórico se conserva, pero no se afirma una compilación nueva de los cambios actuales.
 
-## No implementado
+### Pendiente de validación física
 
-Decodificación y reproducción MP3, PCM, WAV, controles, pantalla, USB MSC, Bluetooth y recuperación automática tras pérdida de la SD.
+- Montaje de tarjeta FAT32 en la Korvo y ruta concreta del BSP.
+- Acceso y listado real por UART, incluyendo nombres largos.
+- Comportamiento con tarjeta ausente, errores de montaje y extracción durante acceso.
+- Hardware final y sus interfaces, que requieren validación independiente.
 
-## Siguiente etapa
+### No implementado
 
-Validar en hardware la ruta de salida PCM generando un tono PCM, y luego implementar reproducción WAV PCM. Tras validar WAV, abordar la decodificación MP3. La ruta de audio del BSP Korvo y sus características no deben asumirse equivalentes al ES8388 del producto final.
+- Decodificación o reproducción MP3, PCM o WAV.
+- Pantalla OLED, controles físicos, USB MSC y Bluetooth.
+- Recuperación automática tras pérdida de tarjeta.
 
-## Cierre
+## Próximo hito
 
-La etapa cierra como PoC de arranque, montaje solicitado e inventario de archivos, con evidencia de host y compilación previa, pero sin validación física. Puede integrarse como una etapa acotada en un repositorio mayor, conservando explícitas estas limitaciones.
+Validar físicamente el montaje SD y el inventario de archivos en ESP32-S31-Korvo-1. Las etapas de audio quedan fuera de esta primera PoC y deben comenzar solo después de cerrar esa validación.

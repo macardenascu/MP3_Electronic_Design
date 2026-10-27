@@ -58,7 +58,7 @@ int main(void)
     assert(cat.count == MUSIC_CATALOG_MAX_TRACKS);
     join(p, sizeof(p), music, "overflow.mp3"); touch(p);
     assert(music_catalog_scan(root, &cat) == ESP_ERR_NO_MEM);
-    assert(cat.count == 0); /* failed scans never expose a partial catalogue */
+    assert(cat.count == 0 && cat.directory_found == 0); /* failed scans publish no partial state */
 
     char root2[] = "build-host/music-catalog-file-XXXXXX";
     assert(mkdtemp(root2) != NULL);
