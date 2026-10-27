@@ -1,0 +1,47 @@
+﻿# ESP-IDF
+**/build/
+**/build_*/
+**/build-host/
+**/managed_components/
+**/sdkconfig
+**/sdkconfig.old
+**/dependencies.lock.tmp
+
+# CMake y Ninja
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/build.ninja
+**/rules.ninja
+.ninja_deps
+.ninja_log
+
+# Compilados y temporales
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+*.bin
+*.elf
+*.map
+*.pyc
+__pycache__/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Editores y sistema operativo
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+Desktop.ini

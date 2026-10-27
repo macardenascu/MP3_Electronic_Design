@@ -1,0 +1,3 @@
+dependencies:
+  idf: ">=6.1"
+  espressif/esp32_s31_korvo_1: "=1.0.1"

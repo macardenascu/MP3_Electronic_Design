@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+project(music_catalog_host_tests C)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+add_executable(music_catalog_test ../../main/music_catalog.c music_catalog_test.c)
+target_include_directories(music_catalog_test PRIVATE include ../../main)
