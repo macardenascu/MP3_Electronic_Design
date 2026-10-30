@@ -1,0 +1,15 @@
+menu "MP3 Electronic Design PoC"
+
+choice POC_MODE
+    prompt "PoC application mode"
+    default POC_MODE_STORAGE
+
+config POC_MODE_STORAGE
+    bool "SD storage diagnostic"
+
+config POC_MODE_PCM
+    bool "ES8389 PCM tone test"
+
+endchoice
+
+endmenu
