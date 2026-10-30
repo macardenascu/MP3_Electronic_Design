@@ -7,6 +7,11 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#ifndef MUSIC_CATALOG_OPENDIR
+#define MUSIC_CATALOG_OPENDIR opendir
+#endif
+extern DIR *MUSIC_CATALOG_OPENDIR(const char *path);
+
 static int ascii_lower(int c)
 {
     return (c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c;
@@ -48,10 +53,9 @@ esp_err_t music_catalog_scan(const char *mount_point, music_catalog_t *catalog)
     struct stat st;
     if (stat(path, &st) != 0) return errno == ENOENT ? ESP_ERR_NOT_FOUND : ESP_FAIL;
     if (!S_ISDIR(st.st_mode)) return ESP_ERR_INVALID_STATE;
-    catalog->directory_found = 1;
-
-    DIR *dir = opendir(path);
+    DIR *dir = MUSIC_CATALOG_OPENDIR(path);
     if (!dir) return ESP_FAIL;
+    catalog->directory_found = 1;
     esp_err_t result = ESP_OK;
     errno = 0;
     struct dirent *entry;

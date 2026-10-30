@@ -32,7 +32,7 @@ Desde la raíz del repositorio:
 Set-Location .\poc\esp32-s31-korvo-1
 $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
 New-Item -ItemType Directory -Force build-host | Out-Null
-gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main main/music_catalog.c tests/host/music_catalog_test.c -o build-host/music_catalog_test.exe
+gcc -std=c11 -Wall -Wextra -Werror -DMUSIC_CATALOG_OPENDIR=music_catalog_test_opendir -I tests/host/include -I main main/music_catalog.c tests/host/music_catalog_test.c -o build-host/music_catalog_test.exe
 if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación de pruebas host' }
 & .\build-host\music_catalog_test.exe
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas host' }

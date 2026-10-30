@@ -16,6 +16,7 @@ The test was run on Windows through MSYS2 GCC with:
 mkdir -p build-host/tmp
 export TMPDIR="$PWD/build-host/tmp"
 gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
+  -DMUSIC_CATALOG_OPENDIR=music_catalog_test_opendir \
   main/music_catalog.c tests/host/music_catalog_test.c \
   -o build-host/music_catalog_test
 ./build-host/music_catalog_test

@@ -6,6 +6,20 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <errno.h>
+
+static int fail_next_opendir;
+
+DIR *music_catalog_test_opendir(const char *path)
+{
+    if (fail_next_opendir) {
+        fail_next_opendir = 0;
+        errno = EACCES;
+        return NULL;
+    }
+    return opendir(path);
+}
 
 static void touch(const char *path)
 {
@@ -30,6 +44,12 @@ int main(void)
     char music[512]; join(music, sizeof(music), root, "MUSIC");
     assert(mkdir(music, 0700) == 0);
     assert(music_catalog_scan(root, &cat) == ESP_OK && cat.count == 0); /* empty */
+
+    /* Inject failure after stat() succeeds; failed scans publish no metadata. */
+    memset(&cat, 0xA5, sizeof(cat));
+    fail_next_opendir = 1;
+    assert(music_catalog_scan(root, &cat) == ESP_FAIL);
+    assert(cat.count == 0 && cat.directory_found == 0);
 
     char p[768];
     join(p, sizeof(p), music, "zeta.Mp3"); touch(p);

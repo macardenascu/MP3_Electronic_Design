@@ -2,64 +2,68 @@
 
 ## Alcance
 
-La primera etapa es una PoC de montaje de almacenamiento e inventario de música. Solicita el montaje SD al BSP Korvo y recorre el directorio inmediato `MUSIC` para identificar archivos `.mp3`. No es una prueba de reproducción.
+Esta etapa valida el montaje microSD y el inventario inmediato de archivos MP3 en `MUSIC` mediante el BSP de la Korvo. No implementa reproducción. El hardware de prueba usa ESP32-S31, ES8389 y SDMMC; el producto objetivo ESP32-S3, ES8388 y microSD SPI requiere validación independiente.
 
-La lógica portable está en `music_catalog.c`; `storage_korvo.c` encapsula el BSP y `app_main.c` presenta diagnósticos por consola. El catálogo tiene capacidad fija de 256 nombres de hasta 255 bytes, acepta extensiones ASCII `.mp3` sin distinguir mayúsculas, ignora directorios y otros tipos, comprueba acceso a archivos y ordena por nombre de forma determinista. Ante error descarta toda la salida del escaneo.
+El catálogo portable acepta `.mp3` sin distinguir mayúsculas ASCII, ignora directorios y otros archivos, comprueba el acceso de lectura, ordena determinísticamente y admite 256 entradas con nombres de hasta 255 bytes. Ese máximo del catálogo se mide en bytes; `FATFS_MAX_LFN=255` es el límite de caracteres configurado en FATFS y no amplía el búfer del catálogo.
 
-La Korvo 1 utiliza ESP32-S31, códec ES8389 y SDMMC. No valida la arquitectura final propuesta de ESP32-S3-WROOM-1-N16R8, ES8388 por I²S y microSD por SPI.
+## Evidencia separada por tipo
 
-## Estado por evidencia
+### Pruebas host anteriores
 
-### Implementado
+Las pruebas host compilan `music_catalog.c` con GCC C11 y un shim de `esp_err.h`. Cubren `MUSIC` inexistente o no-directorio, directorio vacío, extensiones `.mp3` mixtas, archivos ajenos, subdirectorios, ordenamiento, nombre largo, capacidad 256 y rechazo de 257. En esta actualización se añade una falla inyectada de `opendir()` después de que `stat()` confirmó el directorio. Verificación actual: GCC C11 con `-Wall -Wextra -Werror`; resultado `music_catalog tests passed`.
 
-- Llamada al montaje SD de BSP y obtención de su punto de montaje.
-- Búsqueda de `MUSIC`, filtrado y ordenamiento de archivos, comprobación de errores y límite fijo de 256 entradas.
-- Mensajes de diagnóstico por UART.
+### Compilaciones ESP-IDF anteriores
 
-La API de audio y algunos tipos de reproductor en el código son marcadores; no implementan reproducción.
+Se conserva como antecedente la compilación registrada de ESP-IDF 6.1 en modo preview, target `esp32s31`, BSP `espressif/esp32_s31_korvo_1` 1.0.1 y GCC RISC-V 15.2.0: 2153/2153 pasos, binario de aplicación de 319360 bytes (`0x4df80`) y aproximadamente 70 % libre en la partición de aplicación. Es evidencia histórica, no una compilación posterior a los cambios de esta actualización.
 
-### Probado en PC
+### Pruebas físicas sobre la placa
 
-Comando PowerShell ejecutado desde `poc/esp32-s31-korvo-1`:
+El usuario ejecutó el firmware en una ESP32-S31-Korvo-1 V1.1 con microSD insertada. El registro entregado confirma montaje en `/sdcard`, directorio `MUSIC` detectado y tres archivos MP3 listados alfabéticamente. Se conserva el fragmento original:
 
-```powershell
-$env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-New-Item -ItemType Directory -Force build-host | Out-Null
-gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main main/music_catalog.c tests/host/music_catalog_test.c -o build-host/music_catalog_test.exe
-if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación host' }
-& .\build-host\music_catalog_test.exe
-if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas host' }
+```text
+I (285) main_task: Calling app_main()
+[PLAYER] Starting...
+[PLATFORM] ESP32-S31-Korvo-1
+W (285) ESP32-S31-Korvo-1: Warning: Long filenames on SD card are disabled in menuconfig!
+I (295) SD_HOST: src_freq_hz: 500000000
+[SD] Mounted successfully at /sdcard
+[MUSIC] Directory found
+[MUSIC] Tracks: 3
+[TRACK 001] Baby_Im_Yours.mp3
+[TRACK 002] Formidable.mp3
+[TRACK 003] Idilio.mp3
+[PLAYER] Ready
+I (345) main_task: Returned from app_main()
 ```
 
-La suite debe terminar con `music_catalog tests passed`. Cubre directorio inexistente, `MUSIC` como archivo, directorio vacío, extensiones mixtas, archivos no MP3, subdirectorios, ordenamiento, nombre largo, capacidad exacta de 256 y rechazo de la entrada 257. La regresión de capacidad comprueba que un escaneo fallido no deje `directory_found` activado ni entradas parciales.
+Esto valida SD-01 para ese caso concreto. También se recibieron resultados posteriores del usuario para SD-02 a SD-07. SD-02 (MUSIC vacía), SD-03 (MUSIC ausente) y SD-04 (sin microSD, error `ESP_ERR_TIMEOUT`) se reportaron como PASS. Para SD-05 y SD-06 el usuario confirma el contenido preparado (archivos `.txt` y subdirectorios) y que el catálogo solo mostró MP3 válidos del directorio principal; son PASS por confirmación física del usuario, aunque el UART equivalente al de SD-01 no muestra por sí mismo qué entradas se excluyeron. Para SD-07 se reportó que el UART presentó completo `La_Mujer_que_Bota_Fuego_nombre_mas_largo.mp3`, por lo que el resultado funcional es PASS. No se encontró en el checkout `Pruebas PoC.md` ni los logs adicionales; se distingue aquí la confirmación del usuario de la evidencia UART disponible.
 
-Las pruebas de permisos denegados no son portables cuando el proceso corre con privilegios; tampoco simulan extracción de tarjeta durante un escaneo.
+SD-08 (extensiones `.mp3`, `.MP3`, `.Mp3`) queda aplazada por decisión del responsable del proyecto; no es PASS físico. La comparación case-insensitive tiene cobertura host. La advertencia de nombres largos está presente en el primer log. No se dispone del log de la ejecución SD-07 posterior para confirmar si la advertencia desapareció; esto queda como verificación pendiente y no invalida el resultado funcional del nombre largo reportado.
 
-### Compilado para ESP32-S31
+### Verificación de configuración LFN para este cambio
 
-La evidencia registrada en la etapa previa incluye:
+Se inspeccionó `C:\Espressif\v6.1\esp-idf\components\fatfs\Kconfig` de la instalación ESP-IDF 6.1. Allí `FATFS_LFN_HEAP` es una opción oficial de `FATFS_LONG_FILENAMES` («Long filename buffer in heap»). `FATFS_MAX_LFN` depende de que LFN no esté deshabilitado, tiene rango 12–255 y valor predeterminado 255. `sdkconfig.defaults` mantiene el target `CONFIG_IDF_TARGET="esp32s31"` y fija heap y 255. La configuración efectiva disponible en `sdkconfig` y `build_hw_sd/config/sdkconfig.h` también muestra `CONFIG_FATFS_LFN_HEAP=y` y `CONFIG_FATFS_MAX_LFN=255`. La configuración generada confirma esas opciones, pero no se pudo asociar al firmware de la ejecución SD-07 ni comprobar si la advertencia desapareció.
 
-- ESP-IDF 6.1, modo preview, target `esp32s31`, BSP `espressif/esp32_s31_korvo_1` 1.0.1 y GCC RISC-V 15.2.0.
-- Compilación posterior al cambio de nombre del repositorio: 2153/2153 pasos completados.
-- Binario de aplicación de 319360 bytes (`0x4df80`) y aproximadamente 70 % de espacio disponible en la partición de aplicación.
+### Compilación actual de firmware
 
-**Verificación realizada en esta auditoría:** las pruebas host se recompilaron y pasaron, incluida la nueva regresión de salida limpia ante error. No se pudo iniciar un build ESP-IDF nuevo: la activación falló antes de CMake porque `idf_tools.py` no pudo acceder a `esp-clangd` (`WinError 5: Acceso denegado`). También se intentó invocar Ninja directamente sobre un build previo; CMake no pudo regenerarlo porque el entorno `IDF_PATH` no estaba activo. No se modificaron instalaciones globales ni se intentó instalar herramientas. El binario local previamente generado y su evidencia histórica no se alteraron. No se ejecutaron flash ni monitor.
+No se pudo iniciar un build nuevo. La activación de la instalación local ESP-IDF 6.1 falla antes de CMake porque falta la herramienta `esp-clangd` (`Tool esp-clangd not found`, WinError 2). No se instaló ni modificó ninguna herramienta global. Por tanto, los valores de `sdkconfig.defaults` se contrastaron con el Kconfig instalado, pero aún no se verificó el `sdkconfig` resultante de un build limpio ni se generó firmware actualizado.
 
-Históricamente, una auditoría anterior tampoco pudo activar ESP-IDF por el error de acceso a `esp-clangd`. Posteriormente sí se obtuvieron compilaciones satisfactorias desde PowerShell, incluida la compilación de 2153/2153 pasos posterior al cambio de nombre del repositorio. En esta auditoría reapareció el bloqueo de activación; por eso el resultado histórico se conserva, pero no se afirma una compilación nueva de los cambios actuales.
+### Pruebas físicas pendientes
 
-### Pendiente de validación física
+La matriz y los tipos de evidencia por escenario están en [SD_VALIDATION.md](SD_VALIDATION.md). El hito de almacenamiento se acepta y cierra dentro del alcance probado SD-01 a SD-07, con SD-08 expresamente aplazada y sin PASS físico. La ausencia del warning LFN en la ejecución posterior sigue pendiente de evidencia.
 
-- Montaje de tarjeta FAT32 en la Korvo y ruta concreta del BSP.
-- Acceso y listado real por UART, incluyendo nombres largos.
-- Comportamiento con tarjeta ausente, errores de montaje y extracción durante acceso.
-- Hardware final y sus interfaces, que requieren validación independiente.
+## Corrección del contrato del catálogo
 
-### No implementado
+El contrato documentado es que cualquier error deja el catálogo en cero. Antes, `directory_found` se marcaba tras `stat()` y antes de `opendir()`, con lo que el error de apertura dejaba metadatos parciales. Ahora se marca solo tras abrir correctamente. La prueba host inyecta una falla de apertura para probar el caso de forma determinista; no depende de permisos del usuario del sistema operativo.
 
-- Decodificación o reproducción MP3, PCM o WAV.
-- Pantalla OLED, controles físicos, USB MSC y Bluetooth.
-- Recuperación automática tras pérdida de tarjeta.
+## Estado y límites
 
-## Próximo hito
+- **Host:** pruebas ejecutadas y pasadas, incluida regresión de fallo `opendir()`.
+- **ESP-IDF:** configuración LFN modificada; falta compilar este estado con ESP-IDF y verificar `sdkconfig` resultante.
+- **Hardware:** hito aceptado dentro del alcance SD-01 a SD-07 según log o confirmación del usuario. SD-08 aplazada por decisión del responsable; no es PASS físico. No se conserva en este checkout un log UART posterior que confirme la ausencia del warning LFN.
+- No se ha demostrado extracción durante lectura, resistencia a fallas de medio ni funcionamiento del hardware final.
+- No hay decodificación ni reproducción MP3, PCM o WAV; no hay OLED, botones, USB MSC o Bluetooth.
 
-Validar físicamente el montaje SD y el inventario de archivos en ESP32-S31-Korvo-1. Las etapas de audio quedan fuera de esta primera PoC y deben comenzar solo después de cerrar esa validación.
+## Próxima acción
+
+SD-08 queda fuera del cierre actual por decisión del responsable; la prueba host mantiene cobertura del filtrado case-insensitive. Como verificación futura opcional, registrar un arranque posterior con LFN para comprobar la ausencia del warning. El siguiente hito es la salida de audio PCM, sin que esto equivalga a reproducción WAV/MP3.
