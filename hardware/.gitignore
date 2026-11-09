@@ -1,0 +1,19 @@
+# Altium generated caches, recovery data, and local state
+**/History/
+**/Project Logs for */
+**/__Previews/
+**/*.PrjPcbStructure
+**/*.PrjPcb.local
+**/*.PrjPcb.user
+**/*.DsnWrk
+**/*.DsnWrk.User
+**/*.SchDocPreview
+**/*.PcbDocPreview
+**/*.bak
+**/Backup/
+
+# Instructor/vendor libraries: do not redistribute before checking license.
+altium/libraries/external/
+
+# Deliberately TRACK native .PrjPcb/.SchDoc/.PcbDoc and owned .SchLib/.PcbLib.
+# Do not blanket-ignore manufacturing outputs; curate them for release.
