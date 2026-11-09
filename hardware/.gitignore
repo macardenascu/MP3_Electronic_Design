@@ -14,6 +14,8 @@
 
 # Instructor/vendor libraries: do not redistribute before checking license.
 altium/libraries/external/
+# Legacy local location retained while Altium has the source library open.
+altium/librerias/
 
 # Deliberately TRACK native .PrjPcb/.SchDoc/.PcbDoc and owned .SchLib/.PcbLib.
 # Do not blanket-ignore manufacturing outputs; curate them for release.
