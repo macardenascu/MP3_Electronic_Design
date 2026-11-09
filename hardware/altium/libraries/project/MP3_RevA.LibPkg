@@ -1,0 +1,8 @@
+[Design]
+Version=1.0
+
+[Document1]
+DocumentPath=MP3_RevA.SchLib
+
+[Document2]
+DocumentPath=MP3_RevA.PcbLib

@@ -49,3 +49,14 @@ logs/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Altium: local history, previews and generated outputs
+**/History/
+**/__Previews/
+*.PrjPcbStructure
+*.SchDocPreview
+*.PcbDocPreview
+Project Outputs for */
+
+# Course library (professor's, not to be published)
+hardware/altium/libraries/external/
