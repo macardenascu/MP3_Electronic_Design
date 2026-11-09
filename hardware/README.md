@@ -37,7 +37,7 @@ hardware/
     └── WORKFLOW_REV_A.md
 ```
 
-**Current repository status:** only the version-control scaffold is present. Native Altium design files visible on the local computer have **not** been uploaded or validated.
+**Current repository status:** the native Altium project documents are organized under `altium/project/` on `hardware/rev-a-altium`. They have not yet been reopened or validated in Altium from this repository path.
 
 The `shared_lib.IntLib` supplied by the instructor is useful as a reference, but do not publish its binary source in this public repository without confirming redistribution permission. Keep it locally in `hardware/altium/libraries/external/`.
 

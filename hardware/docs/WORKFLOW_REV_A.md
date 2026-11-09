@@ -1,14 +1,14 @@
 # Rev A academic PCB | Work plan
 
-Status: **Planning / native Altium files still local and not yet committed**.
+Status: **Native files integrated on `hardware/rev-a-altium`; Altium reopen and library-link validation pending**.
 
 ## G0 | Repo and Altium setup
 - [x] Project visible in Altium: `MP3_Player.PrjPcb`
 - [x] Local sheets visible: `00_System_Top.SchDoc`, `10_Power_Management.SchDoc`, `60_User_Interface.SchDoc`
 - [x] Local board visible: `MP3_Player.PcbDoc`
 - [x] Professor's integrated library visible in Components panel
-- [ ] Save All and confirm exact local folder contains ALL native files
-- [ ] Move/copy project as a coherent unit into `hardware/altium/project/` inside a clone of this branch, then reopen the new project and verify library links
+- [x] Confirm the project and three schematic sheets plus board are present in `hardware/altium/project/`
+- [ ] Reopen `hardware/altium/project/MP3_Player.PrjPcb` in Altium and verify all document and library links
 - [ ] Verify library redistribution rights before publishing external library binaries
 - [ ] Commit native project files, not only screenshots
 
@@ -55,6 +55,7 @@ Status: **Planning / native Altium files still local and not yet committed**.
 - ESP32-S3 module pin availability and USB pins must be checked before final GPIO assignment.
 - ES8388 output and supplies cannot be inferred from generic DAC diagrams.
 - Instructor's IntLib does not contain all application-specific parts; their footprints are not yet verified.
+- The project file references its three schematic sheets and board by relative filenames; those files are present beside the project. Library links still require manual validation in Altium. The instructor library remains local and excluded from Git pending redistribution permission.
 - Physical validation and 8-hour autonomy are design goals, not demonstrated results.
 
 ## Review discipline
