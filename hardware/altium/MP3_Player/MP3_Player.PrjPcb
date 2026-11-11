@@ -12,7 +12,7 @@ SeparateFolders=0
 TemplateLocationPath=
 PinSwapBy_Netlabel=1
 PinSwapBy_Pin=1
-AllowPortNetNames=0
+AllowPortNetNames=1
 AllowSheetEntryNetNames=1
 AppendSheetNumberToLocalNets=0
 NetlistSinglePinNets=0
@@ -101,23 +101,6 @@ GenerateClassCluster=0
 DocumentUniqueId=PTJZBSWG
 
 [Document4]
-DocumentPath=40_Storage.SchDoc
-AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
-AnnotateSuffix=
-AnnotateScope=All
-AnnotateOrder=5
-DoLibraryUpdate=1
-DoDatabaseUpdate=1
-ClassGenCCAutoEnabled=1
-ClassGenCCAutoRoomEnabled=0
-ClassGenNCAutoScope=None
-DItemRevisionGUID=
-GenerateClassCluster=0
-DocumentUniqueId=QGAIUCLZ
-
-[Document5]
 DocumentPath=30_USB_Interface.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -133,6 +116,23 @@ ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=ESTMRCRF
+
+[Document5]
+DocumentPath=40_Storage.SchDoc
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=5
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=QGAIUCLZ
 
 [Document6]
 DocumentPath=50_Audio_Codec.SchDoc
@@ -200,7 +200,7 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=SUITEPCB
 
 [Document10]
 DocumentPath=..\libraries\project\MP3_RevA.SchLib
@@ -218,6 +218,10 @@ ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=NGZYQCVL
+
+[GeneratedDocument1]
+DocumentPath=Project Outputs for MP3_Player\Design Rule Check - MP3_Player.html
+DItemRevisionGUID=
 
 [Configuration1]
 Name=Sources
