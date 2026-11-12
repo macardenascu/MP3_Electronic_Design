@@ -81,7 +81,7 @@ hardware/
 - [ ] Instructor review of schematics and PCB
 - [ ] Fabrication outputs: Gerbers, drill file and BOM (to be added under `hardware/outputs/`)
 - [ ] Confirm battery cable polarity and OLED module pin order before soldering
-- [ ] Optional: per-block frames on sheets 20, 40, 50 and 60
+- [ ] Optional: per-block frames on sheet 60 (sheets 00–50 done)
 
 ## Git practice
 
