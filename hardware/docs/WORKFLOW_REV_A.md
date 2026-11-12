@@ -1,62 +1,63 @@
 # Rev A academic PCB | Work plan
 
-Status: **Native files integrated on `hardware/rev-a-altium`; Altium reopen and library-link validation pending**.
+Status (2026-11-12): **schematics and PCB complete (ERC 0 errors, DRC 0 violations). Waiting for instructor review
+before generating fabrication outputs.**
 
 ## G0 | Repo and Altium setup
-- [x] Project visible in Altium: `MP3_Player.PrjPcb`
-- [x] Local sheets visible: `00_System_Top.SchDoc`, `10_Power_Management.SchDoc`, `60_User_Interface.SchDoc`
-- [x] Local board visible: `MP3_Player.PcbDoc`
-- [x] Professor's integrated library visible in Components panel
-- [x] Confirm the project and three schematic sheets plus board are present in `hardware/altium/project/`
-- [ ] Reopen `hardware/altium/project/MP3_Player.PrjPcb` in Altium and verify all document and library links
-- [ ] Verify library redistribution rights before publishing external library binaries
-- [ ] Commit native project files, not only screenshots
+- [x] Project in `hardware/altium/MP3_Player/MP3_Player.PrjPcb` with 7 schematic sheets and the board
+- [x] Own library `MP3_RevA` linked to the project
+- [x] Instructor library used locally and excluded from Git pending redistribution permission
+- [x] Native project files committed and merged to `main` (PR #1 schematics, PR #2 PCB)
 
 ## G1 | Library and component evidence
-- [ ] Create BOM/part selection register with MPN, role, manufacturer/datasheet, supply rail, package, footprint source, and review status
-- [ ] Verify symbol pin numbers against datasheet and footprint pads
-- [ ] Verify USB-C, jack, microSD, ESP32-S3, charger, buck-boost, codec, and OLED footprints
-- [ ] Log unresolved components; never assume an IntLib part is correct by origin alone
+- [x] Own symbols and footprints checked against datasheets, pin ↔ pad (see `altium/libraries/project/README.md`)
+- [x] Course-library parts preferred; own parts justified (`GUIA_ESQUEMATICOS_RevA.md`, section 0.4)
+- [x] Footprint fixes found by DRC: microSD and jack anchoring holes (non-plated), USB-C clearance exception
+- [ ] BOM / part register with MPN, manufacturer, supplier and review status (4 own passives still `TBD`)
+- [ ] Footprints confirmed against physical parts before soldering
 
 ## G2 | System architecture and floorplan
-- [ ] Freeze academic MUST requirements with faculty approval for any change
-- [ ] Build interface and preliminary GPIO tables (USB, I2S, SPI, I2C, button, power)
-- [ ] Estimate mechanical constraints and place component outline previews within 100 × 100 mm
-- [ ] Allocate two layers only: Top and Bottom; plan return currents and antenna keepout
-- [ ] Maintain separate wired audio and optional Bluetooth feasibility decisions
+- [x] Interfaces and GPIO table (USB, I²S, SPI, I²C, buttons, ADC) — `GUIA_ESQUEMATICOS_RevA.md`, section 3
+- [x] Two layers only (Top and Bottom), Bottom mainly GND plane
+- [x] Board outline 65 × 90 mm (course limit 100 × 100 mm)
+- [x] Antenna placed outside the board edge, as indicated by the instructor
 
-## G3 | Schematic by verified blocks
-- [ ] Power: USB VBUS, battery protection, MCP73871, TPS63802, power states, power budget
-- [ ] MCU core, strapping, reset, USB and recovery paths
-- [ ] Storage: SPI microSD
-- [ ] Audio: ES8388 I2S, power rails, output loading and ESD
-- [ ] User interface: five buttons, OLED, voltage/pull-up compatibility
-- [ ] Top level: documented hierarchical ports and inter-sheet interfaces
-- [ ] ERC, interface review, and pin-to-pad audit
+## G3 | Schematic by blocks
+- [x] Power: TP4056 charger, AN1149 load sharing (AP2301 + Schottky), AP2112K LDO, ADC dividers
+- [x] MCU core: decoupling, EN reset RC, BOOT/RESET buttons, strapping and PSRAM pins left free, UART header
+- [x] USB-C: CC pull-downs, USBLC6 ESD protection
+- [x] Storage: SPI microSD with pull-ups and card detect
+- [x] Audio: PCM5102A (TI Figure 33 values) → RC filter → TPA6138A2 (G = −1) → 3.5 mm jack
+- [x] User interface: five buttons with pull-ups, OLED header with I²C pull-ups
+- [x] Top level: hierarchical ports and sheet entries
+- [x] ERC: 0 errors (remaining "no driving source" warnings suppressed with No ERC on reviewed nets)
+- [ ] Power budget and battery autonomy estimate
 
 ## G4 | Board design
-- [ ] Manufacturer and fabrication rules specified; two copper layers verified
-- [ ] Component placement/board outline reviewed before routing
-- [ ] Route power and critical nets first, manage continuous ground return
-- [ ] Check analog audio and switching converter separation
-- [ ] DRC and 3D visual review; do not confuse DRC pass with functional validation
+- [x] JLCPCB 2-layer rules with margin for hand soldering (see `hardware/README.md`)
+- [x] Placement reviewed before routing; edge connectors, OLED area and button cross fixed first
+- [x] Power routed first (VBUS, VBAT, VSYS, +3V3), then USB pair, local nets, buses and UI
+- [x] GND polygon pours on Top and Bottom, stitching vias, no isolated GND islands
+- [x] Silkscreen cleaned up (1.0 mm text, 0.15 mm stroke)
+- [x] DRC: 0 violations, 0 warnings; 3D visual review
+- [ ] Instructor review
 
 ## G5 | Academic deliverables
-- [ ] Native Altium project and own libraries
-- [ ] PDFs of schematic and board-layer views; 3D captures if applicable
-- [ ] BOM, net/interface and design decision notes
-- [ ] DRC/ERC reports and explicit exceptions/limitations
-- [ ] Fabrication outputs if required by course, and board-size evidence
-- [ ] Revision-tagged Git checkpoint
+- [x] Native Altium project and own library
+- [ ] PDFs of schematic and board-layer views; 3D captures
+- [ ] BOM and design decision notes
+- [ ] Exported ERC/DRC reports
+- [ ] Fabrication outputs: Gerbers and drill file for JLCPCB, under `hardware/outputs/`
+- [ ] Revision-tagged Git checkpoint (`rev-a`)
 
 ## Current known risks
-- 2-layer signal return and audio noise versus a switching regulator.
-- Battery safety, charger current and power-path protection require datasheet-backed design.
-- ESP32-S3 module pin availability and USB pins must be checked before final GPIO assignment.
-- ES8388 output and supplies cannot be inferred from generic DAC diagrams.
-- Instructor's IntLib does not contain all application-specific parts; their footprints are not yet verified.
-- The project file references its three schematic sheets and board by relative filenames; those files are present beside the project. Library links still require manual validation in Altium. The instructor library remains local and excluded from Git pending redistribution permission.
-- Physical validation and 8-hour autonomy are design goals, not demonstrated results.
+- Battery cable polarity is not standard across JST-PH batteries: check before connecting.
+- OLED module pin order varies by vendor: buy a GND–VCC–SCL–SDA module and check its silkscreen.
+- AP2112K dropout leaves the last part of the battery charge unused.
+- TP4056 dissipates up to ≈ 0.4 W while charging; copper around it acts as heatsink.
+- USB-C (0.5 mm pitch) and TSSOP parts are the hardest joints to hand-solder.
+- The antenna overhangs the 65 × 90 mm outline; check the overall size if an enclosure is made.
+- DRC and ERC passing is not functional validation: nothing has been built or tested yet.
 
 ## Review discipline
 Need → numerical/electrical requirement → alternatives → verified selection → Altium implementation → ERC/DRC checks → status (approved, provisional or pending).
