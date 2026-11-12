@@ -1,48 +1,89 @@
 # Portable MP3 Player | Hardware Rev A
 
-This directory is for the custom PCB designed in **Altium Designer 26.11.1** for the university Electronic Design course. Firmware proof-of-concept work stays under `poc/`.
+Custom PCB designed in **Altium Designer 26.11.1** for the university Electronic Design course.
+Firmware proof-of-concept work stays under `poc/`.
 
-## Academic constraints
+**Status (2026-11-12):** schematics and PCB complete. ERC: 0 errors. DRC: 0 violations, 0 warnings.
+Waiting for instructor review before generating fabrication outputs (Gerbers, drill, BOM).
 
-- **Two copper layers maximum**: Top and Bottom, no internal copper layers.
-- **PCB outline no larger than 100 × 100 mm**.
-- Primary deliverable: a documented and reviewable schematic/PCB. Physical fabrication, assembly, and functional tests have **not** been confirmed as grading requirements.
-- Functional plausibility still matters: no invented power values, datasheet pins, footprints, or test results.
+## Course constraints
 
-## Architecture in scope
+| Constraint | Rev A |
+|---|---|
+| Copper layers | 2 (Top and Bottom), Bottom used mainly as GND plane |
+| Board size | ≤ 100 × 100 mm → final outline **65 × 90 mm** |
+| Fabrication | JLCPCB |
+| Assembly | Hand soldered by the students |
+| Libraries | Instructor's `shared_lib` first; own parts only when justified |
 
-- ESP32-S3-WROOM-1-N16R8
-- ES8388 audio codec and wired 3.5 mm stereo headphones
-- SPI microSD
-- SSD1306 OLED and five physical buttons
-- One-cell Li-Po; proposed MCP73871 power-path charger and TPS63802 buck-boost
-- USB-C power/data
+## Architecture
 
-The BM83 Bluetooth module is **deferred for the academic board proposal**, pending acceptance of the scope change. Its feasibility for a later revision is documented separately; it must not block wired audio.
+| Block | Sheet | Main parts |
+|---|---|---|
+| Block diagram | `00_System_Top` | Hierarchical sheet entries between all blocks |
+| Power | `10_Power_Management` | TP4056 charger (R_PROG 4.7 kΩ ≈ 255 mA), AP2301 P-MOSFET + Schottky load sharing (Microchip AN1149), AP2112K-3.3 LDO, 1S Li-Po on JST-PH, VBAT/2 and VBUS dividers to the ADC |
+| MCU | `20_MCU_Core` | ESP32-S3-WROOM-1-N16R8, EN reset RC, BOOT and RESET buttons, UART header |
+| USB | `30_USB_Interface` | USB-C 2.0 (5 V + data), 4.7 kΩ CC pull-downs, USBLC6-2SC6 ESD protection |
+| Storage | `40_Storage` | microSD socket (GCT MEM2075) in SPI mode, 10 kΩ pull-ups, card detect |
+| Audio | `50_Audio_Codec` | PCM5102A I²S DAC → 470 Ω / 2.2 nF filter → TPA6138A2 headphone amplifier (G = −1) → 3.5 mm jack |
+| User interface | `60_User_Interface` | 5 buttons (active low, 10 kΩ pull-ups), SSD1306 128×64 I²C OLED module on a 4-pin header (GND, VCC, SCL, SDA) |
 
-All parts remain conceptual selections until electrical, footprint, and interface review.
+Power rails: `VBUS` (5 V USB), `VBAT` (3.0–4.2 V), `VSYS` (USB or battery), `+3V3` (logic).
 
-## Working locations
+## Component sources
+
+- **Instructor library (`shared_lib`)**: USB-C, TP4056, AP2301, JST battery connector, Schottky diode,
+  USBLC6, LED, push buttons, headers and all generic 0603 passives.
+- **Own library (`MP3_RevA`)**: ESP32-S3 module, AP2112K, PCM5102A, TPA6138A2, microSD socket,
+  audio jack, and four 0603 values missing from the course library (470 Ω, 100 kΩ, 2.2 µF, 2.2 nF).
+  The reason for each own part is in [GUIA_ESQUEMATICOS_RevA.md](altium/GUIA_ESQUEMATICOS_RevA.md), section 0.4.
+
+`shared_lib` is not published in this repository (license not confirmed). The schematic and PCB
+documents embed every symbol and footprint, so the project opens without it.
+
+## PCB
+
+- Stack-up: FR-4, 1.6 mm, 1 oz copper on both layers.
+- GND polygon pours on Top and Bottom, stitched with vias.
+- ESP32-S3 antenna placed outside the board edge, as indicated by the instructor.
+- Four M3 non-plated mounting holes (3.2 mm). The battery sits under the board.
+- The OLED module is mounted above the board, between the ESP32 and the button cross.
+
+Main design rules (JLCPCB 2-layer, with margin for hand soldering):
+
+| Rule | Value |
+|---|---|
+| Clearance | 0.20 mm (0.15 mm inside the USB-C footprint only) |
+| Track width | 0.25 mm signals, 0.60 mm power (0.40 mm minimum) |
+| Vias | 0.30 mm hole / 0.60 mm diameter |
+| Board outline clearance | 0.30 mm (0 mm for edge connectors and the ESP32) |
+| Solder mask sliver | 0.10 mm (0.13 mm if black or white mask is ordered) |
+| Silkscreen | 1.0 mm text height, 0.15 mm stroke |
+
+## Repository layout
 
 ```text
 hardware/
 ├── README.md
 ├── .gitignore
 ├── altium/
-│   ├── project/           # Native .PrjPcb, .SchDoc, .PcbDoc files (added from local Altium)
+│   ├── GUIA_ESQUEMATICOS_RevA.md   # Step-by-step schematic guide and part justification
+│   ├── MP3_Player/                 # Altium project: .PrjPcb, 7 .SchDoc sheets, .PcbDoc
 │   └── libraries/
-│       ├── project/       # Owned/verified schematic + PCB libraries
-│       └── external/      # Course/vendor libraries, ignored until licensing is checked
+│       ├── project/                # Own library MP3_RevA (.SchLib, .PcbLib, .LibPkg)
+│       └── external/               # Course/vendor libraries, ignored by Git
 └── docs/
     └── WORKFLOW_REV_A.md
 ```
 
-**Current repository status:** the native Altium project documents are organized under `altium/project/` on `hardware/rev-a-altium`. They have not yet been reopened or validated in Altium from this repository path.
+## Pending
 
-The `shared_lib.IntLib` supplied by the instructor is useful as a reference, but do not publish its binary source in this public repository without confirming redistribution permission. Keep it locally in `hardware/altium/libraries/external/`.
-
-See [WORKFLOW_REV_A.md](docs/WORKFLOW_REV_A.md) for checkpoints and acceptance criteria.
+- [ ] Instructor review of schematics and PCB
+- [ ] Fabrication outputs: Gerbers, drill file and BOM (to be added under `hardware/outputs/`)
+- [ ] Confirm battery cable polarity and OLED module pin order before soldering
+- [ ] Optional: per-block frames on sheets 20, 40, 50 and 60
 
 ## Git practice
 
-Work on `hardware/rev-a-altium`, keep commits small and reviewable, and avoid modifying `poc/`. Check `git status` and the current branch before every commit. Preserve the original GPLv3 licensing.
+Work on `hardware/rev-a-altium` and merge to `main` through pull requests at each milestone.
+Do not modify `poc/` from hardware work. Preserve the original GPLv3 licensing.
