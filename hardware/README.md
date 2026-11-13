@@ -37,7 +37,7 @@ Power rails: `VBUS` (5 V USB), `VBAT` (3.0–4.2 V), `VSYS` (USB or battery), `+
   USBLC6, LED, push buttons, headers and all generic 0603 passives.
 - **Own library (`MP3_RevA`)**: ESP32-S3 module, AP2112K, PCM5102A, TPA6138A2, microSD socket,
   audio jack, four 0603 values missing from the course library (470 Ω, 100 kΩ, 2.2 µF, 2.2 nF)
-  and a single-pad test point (`TP_1.5mm`, not in the BOM).
+  and a single-pad test point (`TP`, not in the BOM).
   The reason for each own part is in [GUIA_ESQUEMATICOS_RevA.md](altium/GUIA_ESQUEMATICOS_RevA.md), section 0.4.
 
 `shared_lib` is not published in this repository (license not confirmed). The schematic and PCB
@@ -50,9 +50,8 @@ documents embed every symbol and footprint, so the project opens without it.
 - ESP32-S3 antenna placed outside the board edge, as indicated by the instructor.
 - Four M3 non-plated mounting holes (3.2 mm). The battery sits under the board.
 - The OLED module is mounted above the board, between the ESP32 and the button cross.
-- Test points TP1–TP17: 1.5 mm round SMD pads on Top, placed from the schematics, on the power
-  rails (VBUS, VBAT, VSYS, +3V3, GND), the ADC dividers, EN and IO0, the I²S bus, the DAC output, the
-  amplifier outputs and its MUTE line. Excluded from the BOM.
+- Test points (`TPn`): round SMD pads on Top, placed from the schematics on sheets 10 (power rails,
+  GND and ADC dividers), 20 (EN and IO0) and 50 (audio). Excluded from the BOM.
 - Button silkscreen: `VOL+`, `VOL-`, `PLAY/PAUSE`, `PREV`, `NEXT`, plus `BOOT` and reset.
   The five user buttons share the same circuit (10 kΩ pull-up to an input), so their function is
   assigned in firmware; see the GPIO table in `GUIA_ESQUEMATICOS_RevA.md`, section 3.

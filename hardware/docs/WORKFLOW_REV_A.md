@@ -38,7 +38,7 @@ Waiting for instructor review before generating fabrication outputs.**
 - [x] Placement reviewed before routing; edge connectors, OLED area and button cross fixed first
 - [x] Power routed first (VBUS, VBAT, VSYS, +3V3), then USB pair, local nets, buses and UI
 - [x] GND polygon pours on Top and Bottom, stitching vias, no isolated GND islands
-- [x] Test points TP1–TP17 on power, boot, I²S and audio nets (placed from the schematics, not in the BOM)
+- [x] Test points on power, boot and audio nets (placed from the schematics, not in the BOM)
 - [x] Silkscreen cleaned up (1.0 mm text, 0.15 mm stroke); button labels; dinosaur logo on Bottom Overlay
 - [x] DRC: 0 violations, 0 warnings; 3D visual review
 - [ ] Instructor review
