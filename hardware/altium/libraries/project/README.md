@@ -21,7 +21,7 @@ Every IC/connector footprint has an embedded manufacturer STEP model.
 | TPA6138A2PWR | TSSOP-14_4.4x5mm_P0.65mm | TI SLOS704B, pin table and PW0014A board layout | Ground-centred outputs, no coupling capacitors. UVP left unconnected (internal pull-up). |
 | MEM2075-00-140-01-A | MicroSD_GCT_MEM2075-00-140-01-A | GCT drawing rev A1 | Card-detect switch closes to the shell. NP1/NP2 are non-plated Multi-Layer holes (fixed 2026-11-11). |
 | SJ-3523-SMT | Jack_3.5mm_SameSky_SJ-3523-SMT | Same Sky datasheet 04/15/2025 (rev 1.07) | Pin 1 sleeve, 2 tip (L), 3 ring (R). Pin 4 not populated on this variant. NP1/NP2 are non-plated Multi-Layer holes (fixed 2026-11-11). |
-| TestPoint | TP_1.5mm | Own design | One 1.5 mm round SMD pad on Top, mask opening. Component type *Standard (No BOM)*. Used for TP1–TP17. |
+| TP | TP | Own design | Single round SMD pad on Top, mask opening. Not in the BOM. Used for all board test points. |
 
 ### 0603 passives missing from the course library
 
@@ -53,4 +53,4 @@ Do not place them on the Rev A board.
   (PCM5102A + TPA6138A2 instead of ES8388; MCP73831 + AO3401A + AP2112K instead of MCP73871 + TPS63802).
 - 2026-11-10: four missing 0603 passives added; USB-C, charger, PFET and battery connector moved to `shared_lib`.
 - 2026-11-11: microSD and jack anchoring holes changed from drilled SMT pads to non-plated Multi-Layer pads.
-- 2026-11-12: `TestPoint` / `TP_1.5mm` added for the board test points.
+- 2026-11-12: `TP` symbol and footprint added for the board test points.
