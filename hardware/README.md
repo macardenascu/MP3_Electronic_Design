@@ -3,8 +3,9 @@
 Custom PCB designed in **Altium Designer 26.11.1** for the university Electronic Design course.
 Firmware proof-of-concept work stays under `poc/`.
 
-**Status (2026-11-12):** schematics and PCB complete. ERC: 0 errors. DRC: 0 violations, 0 warnings.
-Waiting for instructor review before generating fabrication outputs (Gerbers, drill, BOM).
+**Status (2026-11-13): Rev A design frozen.** Schematics and PCB complete, including test points,
+button labels and the Bottom logo. ERC: 0 errors. DRC: 0 violations. No further Altium changes are
+planned; the next step is the instructor review, then fabrication outputs (Gerbers, drill, BOM).
 
 ## Course constraints
 
@@ -35,7 +36,8 @@ Power rails: `VBUS` (5 V USB), `VBAT` (3.0–4.2 V), `VSYS` (USB or battery), `+
 - **Instructor library (`shared_lib`)**: USB-C, TP4056, AP2301, JST battery connector, Schottky diode,
   USBLC6, LED, push buttons, headers and all generic 0603 passives.
 - **Own library (`MP3_RevA`)**: ESP32-S3 module, AP2112K, PCM5102A, TPA6138A2, microSD socket,
-  audio jack, and four 0603 values missing from the course library (470 Ω, 100 kΩ, 2.2 µF, 2.2 nF).
+  audio jack, four 0603 values missing from the course library (470 Ω, 100 kΩ, 2.2 µF, 2.2 nF)
+  and a single-pad test point (`TP_1.5mm`, not in the BOM).
   The reason for each own part is in [GUIA_ESQUEMATICOS_RevA.md](altium/GUIA_ESQUEMATICOS_RevA.md), section 0.4.
 
 `shared_lib` is not published in this repository (license not confirmed). The schematic and PCB
@@ -48,6 +50,12 @@ documents embed every symbol and footprint, so the project opens without it.
 - ESP32-S3 antenna placed outside the board edge, as indicated by the instructor.
 - Four M3 non-plated mounting holes (3.2 mm). The battery sits under the board.
 - The OLED module is mounted above the board, between the ESP32 and the button cross.
+- Test points TP1–TP17: 1.5 mm round SMD pads on Top, placed from the schematics, on the power
+  rails (VBUS, VBAT, VSYS, +3V3, GND), the ADC dividers, EN and IO0, the I²S bus, the DAC output, the
+  amplifier outputs and its MUTE line. Excluded from the BOM.
+- Button silkscreen: `VOL+`, `VOL-`, `PLAY/PAUSE`, `PREV`, `NEXT`, plus `BOOT` and reset.
+  The five user buttons share the same circuit (10 kΩ pull-up to an input), so their function is
+  assigned in firmware; see the GPIO table in `GUIA_ESQUEMATICOS_RevA.md`, section 3.
 - Logo (dinosaur, ~18.5 × 22 mm) on the Bottom Overlay, generated from
   `altium/MP3_Player/Logos/dino_mirrored.bmp` (already mirrored for the Bottom side). It is drawn
   as 5 mil silkscreen tracks grouped into a single union, placed in the lower-right area of the
@@ -73,6 +81,7 @@ hardware/
 ├── altium/
 │   ├── GUIA_ESQUEMATICOS_RevA.md   # Step-by-step schematic guide and part justification
 │   ├── MP3_Player/                 # Altium project: .PrjPcb, 7 .SchDoc sheets, .PcbDoc
+│   │   └── Logos/                  # Bottom Overlay logo bitmap
 │   └── libraries/
 │       ├── project/                # Own library MP3_RevA (.SchLib, .PcbLib, .LibPkg)
 │       └── external/               # Course/vendor libraries, ignored by Git
@@ -85,7 +94,8 @@ hardware/
 - [ ] Instructor review of schematics and PCB
 - [ ] Fabrication outputs: Gerbers, drill file and BOM (to be added under `hardware/outputs/`)
 - [ ] Confirm battery cable polarity and OLED module pin order before soldering
-- [ ] Optional: per-block frames on sheet 60 (sheets 00–50 done)
+- [ ] Power budget and battery autonomy estimate
+- Not planned for Rev A: per-block frames on sheet 60 (sheets 00–50 have them)
 
 ## Git practice
 

@@ -4,7 +4,7 @@
 
 A university engineering project exploring a dedicated, offline music player: local audio files, physical controls, and a focused interface without streaming services or smartphone dependency.
 
-> **Status:** firmware proof of concept (PoC) in progress, and custom PCB **Rev A designed** (schematics and layout complete, ERC/DRC clean, awaiting instructor review). File-catalog logic has host tests and recorded firmware-build evidence. Physical operation, audio playback, and the custom hardware are **not yet validated**.
+> **Status:** firmware proof of concept (PoC) in progress, and custom PCB **Rev A design frozen** (schematics and layout complete with test points, ERC/DRC clean, awaiting instructor review). File-catalog logic has host tests and recorded firmware-build evidence. Physical operation, audio playback, and the custom hardware are **not yet validated**.
 
 ## Project goals
 
@@ -74,7 +74,7 @@ Final-device firmware is **not yet versioned**; it will be added only when the c
 
 1. Validate SD mounting and the catalog on a physical ESP32-S31-Korvo-1.
 2. Establish and test an audio path on the PoC board.
-3. ~~Complete the target schematic and PCB layout~~ (Rev A done); add the power budget and fabrication outputs.
+3. ~~Complete the target schematic and PCB layout~~ (Rev A frozen); after instructor review, generate fabrication outputs and add the power budget.
 4. Fabricate, assemble, and validate the custom PCB separately from the Korvo.
 5. Implement final-device firmware, then assess USB MSC and BM83 integration.
 

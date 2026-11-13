@@ -1,13 +1,13 @@
 # Rev A academic PCB | Work plan
 
-Status (2026-11-12): **schematics and PCB complete (ERC 0 errors, DRC 0 violations). Waiting for instructor review
-before generating fabrication outputs.**
+Status (2026-11-13): **Rev A design frozen (ERC 0 errors, DRC 0 violations). No further Altium changes planned.
+Waiting for instructor review before generating fabrication outputs.**
 
 ## G0 | Repo and Altium setup
 - [x] Project in `hardware/altium/MP3_Player/MP3_Player.PrjPcb` with 7 schematic sheets and the board
 - [x] Own library `MP3_RevA` linked to the project
 - [x] Instructor library used locally and excluded from Git pending redistribution permission
-- [x] Native project files committed and merged to `main` (PR #1 schematics, PR #2 PCB)
+- [x] Native project files committed and merged to `main` (PR #1 schematics, PR #2 PCB, PR #3–#5 fixes, docs and logo)
 
 ## G1 | Library and component evidence
 - [x] Own symbols and footprints checked against datasheets, pin ↔ pad (see `altium/libraries/project/README.md`)
@@ -38,7 +38,8 @@ before generating fabrication outputs.**
 - [x] Placement reviewed before routing; edge connectors, OLED area and button cross fixed first
 - [x] Power routed first (VBUS, VBAT, VSYS, +3V3), then USB pair, local nets, buses and UI
 - [x] GND polygon pours on Top and Bottom, stitching vias, no isolated GND islands
-- [x] Silkscreen cleaned up (1.0 mm text, 0.15 mm stroke)
+- [x] Test points TP1–TP17 on power, boot, I²S and audio nets (placed from the schematics, not in the BOM)
+- [x] Silkscreen cleaned up (1.0 mm text, 0.15 mm stroke); button labels; dinosaur logo on Bottom Overlay
 - [x] DRC: 0 violations, 0 warnings; 3D visual review
 - [ ] Instructor review
 
