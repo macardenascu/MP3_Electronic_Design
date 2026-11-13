@@ -48,6 +48,10 @@ documents embed every symbol and footprint, so the project opens without it.
 - ESP32-S3 antenna placed outside the board edge, as indicated by the instructor.
 - Four M3 non-plated mounting holes (3.2 mm). The battery sits under the board.
 - The OLED module is mounted above the board, between the ESP32 and the button cross.
+- Logo (dinosaur, ~18.5 × 22 mm) on the Bottom Overlay, generated from
+  `altium/MP3_Player/Logos/dino_mirrored.bmp` (already mirrored for the Bottom side). It is drawn
+  as 5 mil silkscreen tracks grouped into a single union, placed in the lower-right area of the
+  Bottom side, clear of pads, vias, mask openings and the battery, and ≥ 1 mm from the board edge.
 
 Main design rules (JLCPCB 2-layer, with margin for hand soldering):
 
