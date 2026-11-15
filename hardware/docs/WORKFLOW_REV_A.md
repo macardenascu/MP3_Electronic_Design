@@ -1,7 +1,7 @@
 # Rev A academic PCB | Work plan
 
-Status (2026-11-13): **Rev A design frozen (ERC 0 errors, DRC 0 violations). No further Altium changes planned.
-Waiting for instructor review before generating fabrication outputs.**
+Status (2026-11-14): **Rev A design frozen (ERC 0 errors, DRC 0 violations) and reviewed by the instructor
+(positive). Next: fabrication outputs.**
 
 ## G0 | Repo and Altium setup
 - [x] Project in `hardware/altium/MP3_Player/MP3_Player.PrjPcb` with 7 schematic sheets and the board
@@ -31,7 +31,7 @@ Waiting for instructor review before generating fabrication outputs.**
 - [x] User interface: five buttons with pull-ups, OLED header with I²C pull-ups
 - [x] Top level: hierarchical ports and sheet entries
 - [x] ERC: 0 errors (remaining "no driving source" warnings suppressed with No ERC on reviewed nets)
-- [ ] Power budget and battery autonomy estimate
+- [x] Power budget and battery autonomy estimate (`POWER_BUDGET_REV_A.md`; measured validation pending)
 
 ## G4 | Board design
 - [x] JLCPCB 2-layer rules with margin for hand soldering (see `hardware/README.md`)
@@ -39,9 +39,9 @@ Waiting for instructor review before generating fabrication outputs.**
 - [x] Power routed first (VBUS, VBAT, VSYS, +3V3), then USB pair, local nets, buses and UI
 - [x] GND polygon pours on Top and Bottom, stitching vias, no isolated GND islands
 - [x] Test points on power, boot and audio nets (placed from the schematics, not in the BOM)
-- [x] Silkscreen cleaned up (1.0 mm text, 0.15 mm stroke); button labels; dinosaur logo on Bottom Overlay
+- [x] Silkscreen cleaned up (1.0 mm text, 0.15 mm stroke); button and connector labels (J1–J7); dinosaur logo on Bottom Overlay
 - [x] DRC: 0 violations, 0 warnings; 3D visual review
-- [ ] Instructor review
+- [x] Instructor review (2026-11-14, positive)
 
 ## G5 | Academic deliverables
 - [x] Native Altium project and own library

@@ -3,9 +3,9 @@
 Custom PCB designed in **Altium Designer 26.11.1** for the university Electronic Design course.
 Firmware proof-of-concept work stays under `poc/`.
 
-**Status (2026-11-13): Rev A design frozen.** Schematics and PCB complete, including test points,
-button labels and the Bottom logo. ERC: 0 errors. DRC: 0 violations. No further Altium changes are
-planned; the next step is the instructor review, then fabrication outputs (Gerbers, drill, BOM).
+**Status (2026-11-14): Rev A design frozen and reviewed by the instructor (positive review).**
+Schematics and PCB complete, including test points, connector and button labels, and the Bottom logo.
+ERC: 0 errors. DRC: 0 violations. Next step: fabrication outputs (Gerbers, drill, BOM).
 
 ## Course constraints
 
@@ -52,6 +52,8 @@ documents embed every symbol and footprint, so the project opens without it.
 - The OLED module is mounted above the board, between the ESP32 and the button cross.
 - Test points (`TPn`): round SMD pads on Top, placed from the schematics on sheets 10 (power rails,
   GND and ADC dividers), 20 (EN and IO0) and 50 (audio). Excluded from the BOM.
+- Connector silkscreen, for the user: J1 `BATERIA`, J2 `USB-C`, J3 `MICRO SD`, J4 `AUDIO`,
+  J5 `ON/OFF`, J6 `PANTALLA` (OLED, GND–VCC–SCL–SDA) and J7 `UART` (debug, TX = IO43, RX = IO44).
 - Button silkscreen: `VOL+`, `VOL-`, `PLAY/PAUSE`, `PREV`, `NEXT`, plus `BOOT` and reset.
   The five user buttons share the same circuit (10 kΩ pull-up to an input), so their function is
   assigned in firmware; see the GPIO table in `GUIA_ESQUEMATICOS_RevA.md`, section 3.
@@ -87,15 +89,17 @@ hardware/
 │       ├── project/                # Own library MP3_RevA (.SchLib, .PcbLib, .LibPkg)
 │       └── external/               # Course/vendor libraries, ignored by Git
 └── docs/
-    └── WORKFLOW_REV_A.md
+    ├── WORKFLOW_REV_A.md
+    └── POWER_BUDGET_REV_A.md       # Current budget and battery autonomy estimate
 ```
 
 ## Pending
 
-- [ ] Instructor review of schematics and PCB
+- [x] Instructor review of schematics and PCB (2026-11-14, positive)
+- [x] Power budget and battery autonomy estimate: [POWER_BUDGET_REV_A.md](docs/POWER_BUDGET_REV_A.md)
+  (≈ 115 mA in playback, ≈ 7.5 h with a 1000 mAh cell; to be confirmed by measurement)
 - [ ] Fabrication outputs: Gerbers, drill file and BOM (to be added under `hardware/outputs/`)
 - [ ] Confirm battery cable polarity and OLED module pin order before soldering
-- [ ] Power budget and battery autonomy estimate
 - Not planned for Rev A: per-block frames on sheet 60 (sheets 00–50 have them)
 
 ## Git practice
