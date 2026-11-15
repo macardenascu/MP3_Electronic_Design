@@ -55,10 +55,12 @@ documents embed every symbol and footprint, so the project opens without it.
 - Button silkscreen: `VOL+`, `VOL-`, `PLAY/PAUSE`, `PREV`, `NEXT`, plus `BOOT` and reset.
   The five user buttons share the same circuit (10 kΩ pull-up to an input), so their function is
   assigned in firmware; see the GPIO table in `GUIA_ESQUEMATICOS_RevA.md`, section 3.
-- Logo (dinosaur, ~18.5 × 22 mm) on the Bottom Overlay, generated from
-  `altium/MP3_Player/Logos/dino_mirrored.bmp` (already mirrored for the Bottom side). It is drawn
-  as 5 mil silkscreen tracks grouped into a single union, placed in the lower-right area of the
-  Bottom side, clear of pads, vias, mask openings and the battery, and ≥ 1 mm from the board edge.
+- Logo (dinosaur, ~19.2 × 24.8 mm) on the Bottom Overlay, generated from
+  `altium/MP3_Player/Logos/dino_SXM_25mm_bottom_1px=1mil.bmp` (1 px = 1 mil, already mirrored for
+  the Bottom side). It is drawn as 6 mil (0.152 mm, JLCPCB minimum) silkscreen tracks, one per
+  5-pixel row, grouped into a single union. It sits in the lower-right area of the Bottom side
+  (X 2410–3166 mil, Y 1050–2027 mil), ≥ 12 mil from pads and vias, clear of mask openings, and
+  ≥ 1 mm from the board edge.
 
 Main design rules (JLCPCB 2-layer, with margin for hand soldering):
 
