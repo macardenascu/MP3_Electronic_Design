@@ -11,6 +11,9 @@
 **/*.PcbDocPreview
 **/*.bak
 **/Backup/
+outputs/MP3_entregables.zip
+outputs/MP3_entregables/ALTIUM/
+altium/MP3_Player/Project_Outputs_for_MP3_Player/
 
 # Instructor/vendor libraries: do not redistribute before checking license.
 altium/libraries/external/
