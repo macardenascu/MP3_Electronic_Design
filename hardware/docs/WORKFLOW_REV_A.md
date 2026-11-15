@@ -11,13 +11,13 @@ Status (2026-11-14): **Rev A design frozen (ERC 0 errors, DRC 0 violations) and 
 
 ## G1 | Library and component evidence
 - [x] Own symbols and footprints checked against datasheets, pin ↔ pad (see `altium/libraries/project/README.md`)
-- [x] Course-library parts preferred; own parts justified (`GUIA_ESQUEMATICOS_RevA.md`, section 0.4)
+- [x] Course-library parts preferred; own parts justified (`MANUAL_CONEXIONES_RevA.md`, section 7)
 - [x] Footprint fixes found by DRC: microSD and jack anchoring holes (non-plated), USB-C clearance exception
-- [ ] BOM / part register with MPN, manufacturer, supplier and review status (BOM exported; the 4 own passives are still `TBD` and grouped in one BOM line, and the test points list KOA RCWCTE)
+- [x] BOM exported in the grouping the instructor asks for (the 4 own 0603 passives share one line with manufacturer `TBD`; test points list KOA RCWCTE)
 - [ ] Footprints confirmed against physical parts before soldering
 
 ## G2 | System architecture and floorplan
-- [x] Interfaces and GPIO table (USB, I²S, SPI, I²C, buttons, ADC) — `GUIA_ESQUEMATICOS_RevA.md`, section 3
+- [x] Interfaces and GPIO table (USB, I²S, SPI, I²C, buttons, ADC) — `MANUAL_CONEXIONES_RevA.md`, section 3
 - [x] Two layers only (Top and Bottom), Bottom mainly GND plane
 - [x] Board outline 65 × 90.17 mm (from the Gerber profile) (course limit 100 × 100 mm)
 - [x] Antenna placed outside the board edge, as indicated by the instructor
@@ -45,12 +45,13 @@ Status (2026-11-14): **Rev A design frozen (ERC 0 errors, DRC 0 violations) and 
 
 ## G5 | Academic deliverables
 - [x] Native Altium project and own library
-- [x] PDFs: schematics (`SHC/MP3_Player.pdf`), Draftsman fabrication drawing, 3D PDF and STEP model
-- [x] BOM (`BOM/MP3_Player.xlsx`); design decisions in `GUIA_ESQUEMATICOS_RevA.md` and the READMEs
+- [x] PDFs: schematics (`SHC/SCH.pdf`), Draftsman fabrication drawing, 3D PDF and STEP model
+- [x] BOM (`BOM/BOM.xlsx`); design decisions in `MANUAL_CONEXIONES_RevA.md` and the READMEs
 - [x] DRC report exported (0 violations, 0 warnings; inside `GERBERS/GERBERS.zip`)
-- [ ] ERC report exported
+- [x] ERC: 0 errors in Altium; exported report not required by the course
 - [x] Fabrication outputs: Gerbers and NC drill for JLCPCB, under `hardware/outputs/MP3_entregables/` (2026-11-14)
-- [ ] Revision-tagged Git checkpoint (`rev-a`)
+- [x] Revision-tagged Git checkpoint (`rev-a`, after the USB fix of 2026-11-15)
+- [x] Delivered to the instructor (Classroom, 2026-11-15)
 
 ## Current known risks
 - Battery cable polarity is not standard across JST-PH batteries: check before connecting.

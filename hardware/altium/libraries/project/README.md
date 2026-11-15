@@ -2,7 +2,7 @@
 
 Components the course library (`shared_lib.IntLib`) does not have, or does not have in a usable form.
 Everything else on the board comes from the course library (see `hardware/README.md`).
-The reason for each own part is in [GUIA_ESQUEMATICOS_RevA.md](../../GUIA_ESQUEMATICOS_RevA.md), section 0.4.
+The reason for each own part is in [MANUAL_CONEXIONES_RevA.md](../../../docs/MANUAL_CONEXIONES_RevA.md), section 7.
 
 Files: `MP3_RevA.SchLib`, `MP3_RevA.PcbLib`, `MP3_RevA.LibPkg` (open it and run
 *Project → Compile Integrated Library* to get `MP3_RevA.IntLib`).

@@ -3,9 +3,9 @@
 Custom PCB designed in **Altium Designer 26.11.1** for the university Electronic Design course.
 Firmware proof-of-concept work stays under `poc/`.
 
-**Status (2026-11-14): Rev A design frozen and reviewed by the instructor (positive review).**
-Schematics and PCB complete, including test points, connector and button labels, and the Bottom logo.
-ERC: 0 errors. DRC: 0 violations. Next step: fabrication outputs (Gerbers, drill, BOM).
+**Status (2026-11-15): Rev A delivered** (tag `rev-a`). Reviewed by the instructor (positive), USB data
+lines fixed, fabrication outputs in `outputs/MP3_entregables/`. ERC: 0 errors. DRC: 0 violations, 0 warnings.
+How everything is wired: [MANUAL_CONEXIONES_RevA.md](docs/MANUAL_CONEXIONES_RevA.md).
 
 ## Course constraints
 
@@ -38,7 +38,7 @@ Power rails: `VBUS` (5 V USB), `VBAT` (3.0–4.2 V), `VSYS` (USB or battery), `+
 - **Own library (`MP3_RevA`)**: ESP32-S3 module, AP2112K, PCM5102A, TPA6138A2, microSD socket,
   audio jack, four 0603 values missing from the course library (470 Ω, 100 kΩ, 2.2 µF, 2.2 nF)
   and a single-pad test point (`TP`, not in the BOM).
-  The reason for each own part is in [GUIA_ESQUEMATICOS_RevA.md](altium/GUIA_ESQUEMATICOS_RevA.md), section 0.4.
+  The reason for each own part is in the [connection manual](docs/MANUAL_CONEXIONES_RevA.md), section 7.
 
 `shared_lib` is not published in this repository (license not confirmed). The schematic and PCB
 documents embed every symbol and footprint, so the project opens without it.
@@ -56,7 +56,7 @@ documents embed every symbol and footprint, so the project opens without it.
   J5 `ON/OFF`, J6 `PANTALLA` (OLED, GND–VCC–SCL–SDA) and J7 `UART` (debug, TX = IO43, RX = IO44).
 - Button silkscreen: `VOL+`, `VOL-`, `PLAY/PAUSE`, `PREV`, `NEXT`, plus `BOOT` and reset.
   The five user buttons share the same circuit (10 kΩ pull-up to an input), so their function is
-  assigned in firmware; see the GPIO table in `GUIA_ESQUEMATICOS_RevA.md`, section 3.
+  assigned in firmware; see the GPIO map in [MANUAL_CONEXIONES_RevA.md](docs/MANUAL_CONEXIONES_RevA.md), section 3.
 - Logo (dinosaur, ~19.2 × 24.8 mm) on the Bottom Overlay, generated from
   `altium/MP3_Player/Logos/dino_SXM_25mm_bottom_1px=1mil.bmp` (1 px = 1 mil, already mirrored for
   the Bottom side). It is drawn as 6 mil (0.152 mm, JLCPCB minimum) silkscreen tracks, one per
@@ -82,7 +82,6 @@ hardware/
 ├── README.md
 ├── .gitignore
 ├── altium/
-│   ├── GUIA_ESQUEMATICOS_RevA.md   # Step-by-step schematic guide and part justification
 │   ├── MP3_Player/                 # Altium project: .PrjPcb, 7 .SchDoc sheets, .PcbDoc
 │   │   └── Logos/                  # Bottom Overlay logo bitmap
 │   └── libraries/
@@ -92,6 +91,7 @@ hardware/
 │   └── MP3_entregables/            # Release outputs: GERBERS (zip, with DRC report), BOM, DRAFTSMAN (PDF),
 │                                   # 3D (STEP, PDF3D), SHC (schematic PDF)
 └── docs/
+    ├── MANUAL_CONEXIONES_RevA.md   # Connection manual: connectors, GPIO map, blocks, test points
     ├── WORKFLOW_REV_A.md
     └── POWER_BUDGET_REV_A.md       # Current budget and battery autonomy estimate
 ```
@@ -102,7 +102,9 @@ hardware/
 - [x] Power budget and battery autonomy estimate: [POWER_BUDGET_REV_A.md](docs/POWER_BUDGET_REV_A.md)
   (≈ 115 mA in playback, ≈ 7.5 h with a 1000 mAh cell; to be confirmed by measurement)
 - [x] Fabrication outputs under `outputs/MP3_entregables/` (Gerbers + drill, BOM, Draftsman, 3D, schematic PDF)
-- [ ] Fill manufacturer data for the 4 own 0603 passives (still `TBD` in the BOM)
+- [x] USB D+/D− connected to IO20/IO19 (found unconnected in review; fixed and outputs regenerated on 2026-11-15)
+- [x] Tag `rev-a` and delivery to the instructor (2026-11-15)
+- [x] Connection manual: [MANUAL_CONEXIONES_RevA.md](docs/MANUAL_CONEXIONES_RevA.md)
 - [ ] Confirm battery cable polarity and OLED module pin order before soldering
 - Not planned for Rev A: per-block frames on sheet 60 (sheets 00–50 have them)
 
