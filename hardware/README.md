@@ -12,7 +12,7 @@ ERC: 0 errors. DRC: 0 violations. Next step: fabrication outputs (Gerbers, drill
 | Constraint | Rev A |
 |---|---|
 | Copper layers | 2 (Top and Bottom), Bottom used mainly as GND plane |
-| Board size | ≤ 100 × 100 mm → final outline **65 × 90 mm** |
+| Board size | ≤ 100 × 100 mm → final outline **65 × 90.17 mm** |
 | Fabrication | JLCPCB |
 | Assembly | Hand soldered by the students |
 | Libraries | Instructor's `shared_lib` first; own parts only when justified |
@@ -88,6 +88,9 @@ hardware/
 │   └── libraries/
 │       ├── project/                # Own library MP3_RevA (.SchLib, .PcbLib, .LibPkg)
 │       └── external/               # Course/vendor libraries, ignored by Git
+├── outputs/
+│   └── MP3_entregables/            # Release outputs: GERBERS (zip, with DRC report), BOM, DRAFTSMAN (PDF),
+│                                   # 3D (STEP, PDF3D), SHC (schematic PDF)
 └── docs/
     ├── WORKFLOW_REV_A.md
     └── POWER_BUDGET_REV_A.md       # Current budget and battery autonomy estimate
@@ -98,7 +101,8 @@ hardware/
 - [x] Instructor review of schematics and PCB (2026-11-14, positive)
 - [x] Power budget and battery autonomy estimate: [POWER_BUDGET_REV_A.md](docs/POWER_BUDGET_REV_A.md)
   (≈ 115 mA in playback, ≈ 7.5 h with a 1000 mAh cell; to be confirmed by measurement)
-- [ ] Fabrication outputs: Gerbers, drill file and BOM (to be added under `hardware/outputs/`)
+- [x] Fabrication outputs under `outputs/MP3_entregables/` (Gerbers + drill, BOM, Draftsman, 3D, schematic PDF)
+- [ ] Fill manufacturer data for the 4 own 0603 passives (still `TBD` in the BOM)
 - [ ] Confirm battery cable polarity and OLED module pin order before soldering
 - Not planned for Rev A: per-block frames on sheet 60 (sheets 00–50 have them)
 
