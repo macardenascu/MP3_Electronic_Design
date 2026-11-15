@@ -13,13 +13,13 @@ Status (2026-11-14): **Rev A design frozen (ERC 0 errors, DRC 0 violations) and 
 - [x] Own symbols and footprints checked against datasheets, pin ↔ pad (see `altium/libraries/project/README.md`)
 - [x] Course-library parts preferred; own parts justified (`GUIA_ESQUEMATICOS_RevA.md`, section 0.4)
 - [x] Footprint fixes found by DRC: microSD and jack anchoring holes (non-plated), USB-C clearance exception
-- [ ] BOM / part register with MPN, manufacturer, supplier and review status (4 own passives still `TBD`)
+- [ ] BOM / part register with MPN, manufacturer, supplier and review status (BOM exported; the 4 own passives are still `TBD` and grouped in one BOM line, and the test points list KOA RCWCTE)
 - [ ] Footprints confirmed against physical parts before soldering
 
 ## G2 | System architecture and floorplan
 - [x] Interfaces and GPIO table (USB, I²S, SPI, I²C, buttons, ADC) — `GUIA_ESQUEMATICOS_RevA.md`, section 3
 - [x] Two layers only (Top and Bottom), Bottom mainly GND plane
-- [x] Board outline 65 × 90 mm (course limit 100 × 100 mm)
+- [x] Board outline 65 × 90.17 mm (from the Gerber profile) (course limit 100 × 100 mm)
 - [x] Antenna placed outside the board edge, as indicated by the instructor
 
 ## G3 | Schematic by blocks
@@ -45,10 +45,11 @@ Status (2026-11-14): **Rev A design frozen (ERC 0 errors, DRC 0 violations) and 
 
 ## G5 | Academic deliverables
 - [x] Native Altium project and own library
-- [ ] PDFs of schematic and board-layer views; 3D captures
-- [ ] BOM and design decision notes
-- [ ] Exported ERC/DRC reports
-- [ ] Fabrication outputs: Gerbers and drill file for JLCPCB, under `hardware/outputs/`
+- [x] PDFs: schematics (`SHC/MP3_Player.pdf`), Draftsman fabrication drawing, 3D PDF and STEP model
+- [x] BOM (`BOM/MP3_Player.xlsx`); design decisions in `GUIA_ESQUEMATICOS_RevA.md` and the READMEs
+- [x] DRC report exported (0 violations, 0 warnings; inside `GERBERS/GERBERS.zip`)
+- [ ] ERC report exported
+- [x] Fabrication outputs: Gerbers and NC drill for JLCPCB, under `hardware/outputs/MP3_entregables/` (2026-11-14)
 - [ ] Revision-tagged Git checkpoint (`rev-a`)
 
 ## Current known risks
@@ -57,7 +58,7 @@ Status (2026-11-14): **Rev A design frozen (ERC 0 errors, DRC 0 violations) and 
 - AP2112K dropout leaves the last part of the battery charge unused.
 - TP4056 dissipates up to ≈ 0.4 W while charging; copper around it acts as heatsink.
 - USB-C (0.5 mm pitch) and TSSOP parts are the hardest joints to hand-solder.
-- The antenna overhangs the 65 × 90 mm outline; check the overall size if an enclosure is made.
+- The antenna overhangs the 65 × 90.17 mm outline; check the overall size if an enclosure is made.
 - DRC and ERC passing is not functional validation: nothing has been built or tested yet.
 
 ## Review discipline

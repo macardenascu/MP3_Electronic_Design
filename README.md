@@ -27,7 +27,7 @@ These are **design goals**, not a claim that every feature is implemented.
 | USB | USB-C 2.0 (power and data), USBLC6 ESD protection; USB MSC planned | In schematic and layout; firmware pending |
 | Wireless | BM83 Bluetooth module | Deferred; not part of Rev A |
 
-Board: 2 layers, 65 × 90 mm, designed for JLCPCB and hand soldering. Details in **[hardware/README.md](hardware/README.md)**.
+Board: 2 layers, 65 × 90.17 mm, designed for JLCPCB and hand soldering. Details in **[hardware/README.md](hardware/README.md)**.
 
 **Important platform distinction:** The ESP32-S31-Korvo-1 is a temporary PoC board. It uses an ESP32-S31, ES8389 audio codec, and SDMMC storage interface. Results obtained with this board do **not** validate the ESP32-S3, PCM5102A/TPA6138A2, or SPI-based architecture of the custom PCB.
 
@@ -74,7 +74,7 @@ Final-device firmware is **not yet versioned**; it will be added only when the c
 
 1. Validate SD mounting and the catalog on a physical ESP32-S31-Korvo-1.
 2. Establish and test an audio path on the PoC board.
-3. ~~Complete the target schematic and PCB layout~~ (Rev A frozen and reviewed); ~~power budget~~ ([estimate](hardware/docs/POWER_BUDGET_REV_A.md)); generate fabrication outputs.
+3. ~~Complete the target schematic and PCB layout~~ (Rev A frozen and reviewed); ~~power budget~~ ([estimate](hardware/docs/POWER_BUDGET_REV_A.md)); ~~generate fabrication outputs~~ (`hardware/outputs/`).
 4. Fabricate, assemble, and validate the custom PCB separately from the Korvo.
 5. Implement final-device firmware, then assess USB MSC and BM83 integration.
 
