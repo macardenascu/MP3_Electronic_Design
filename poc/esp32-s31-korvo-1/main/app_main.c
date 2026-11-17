@@ -3,14 +3,15 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "audio_korvo.h"
-#if !CONFIG_POC_MODE_PCM
+#include "audio_bsp_tone.h"
+#if !CONFIG_POC_MODE_PCM && !CONFIG_POC_MODE_TONE_BSP
 #include "music_catalog.h"
 #include "storage_korvo.h"
 #endif
 
 static const char *TAG = "player";
 /* Keep the fixed-capacity catalogue out of app_main's task stack. */
-#if !CONFIG_POC_MODE_PCM
+#if !CONFIG_POC_MODE_PCM && !CONFIG_POC_MODE_TONE_BSP
 static music_catalog_t s_catalog;
 #endif
 
@@ -20,6 +21,11 @@ void app_main(void)
     const esp_err_t audio_err = audio_korvo_play_test_tone();
     if (audio_err != ESP_OK) {
         ESP_LOGE(TAG, "PCM test failed: %s", esp_err_to_name(audio_err));
+    }
+#elif CONFIG_POC_MODE_TONE_BSP
+    const esp_err_t tone_err = audio_bsp_tone_run();
+    if (tone_err != ESP_OK) {
+        ESP_LOGE(TAG, "BSP tone test failed: %s", esp_err_to_name(tone_err));
     }
 #else
     printf("[PLAYER] Starting...\n");

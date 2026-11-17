@@ -8,10 +8,13 @@ target_compile_definitions(music_catalog_test PRIVATE MUSIC_CATALOG_OPENDIR=musi
 
 # Portable player core (main/core): pure logic, no peripherals.
 set(CORE_DIR ../../main/core)
-set(CORE_TESTS volume mute_sequencer power_policy player_core)
+set(CORE_TESTS volume mute_sequencer power_policy player_core tone_gen)
 foreach(name IN LISTS CORE_TESTS)
     add_executable(${name}_test ${name}_test.c ${CORE_DIR}/${name}.c)
     target_include_directories(${name}_test PRIVATE include ${CORE_DIR})
     target_compile_options(${name}_test PRIVATE -Wall -Wextra -Werror)
 endforeach()
 target_sources(player_core_test PRIVATE ${CORE_DIR}/volume.c)
+if(NOT MSVC)
+    target_link_libraries(tone_gen_test PRIVATE m) # sin()/lround()
+endif()

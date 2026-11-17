@@ -32,6 +32,9 @@ for t in volume mute_sequencer power_policy; do
     main/core/$t.c tests/host/${t}_test.c -o build-host/${t}_test && ./build-host/${t}_test
 done
 gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
+  main/core/tone_gen.c tests/host/tone_gen_test.c -lm \
+  -o build-host/tone_gen_test && ./build-host/tone_gen_test
+gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
   main/core/player_core.c main/core/volume.c tests/host/player_core_test.c \
   -o build-host/player_core_test && ./build-host/player_core_test
 ```
