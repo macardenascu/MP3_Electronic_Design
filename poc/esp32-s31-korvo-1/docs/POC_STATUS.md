@@ -62,7 +62,7 @@ El contrato documentado es que cualquier error deja el catálogo en cero. Antes,
 - **ESP-IDF:** compilado con ESP-IDF 6.1 en `poc/esp32-s31-korvo-1/build_s31` en modo STORAGE y TONE_BSP; el binario flasheado para la prueba audible de E2.2 es el de `build_s31`. `build_tonebsp` fue una verificación previa de compilación del mismo commit. Ver E2.
 - **Hardware:** hito aceptado dentro del alcance SD-01 a SD-07 según log o confirmación del usuario. SD-08 aplazada por decisión del responsable; no es PASS físico. El pendiente LFN de SD-07 se cierra en E2.1: el aviso es un falso positivo del BSP 1.0.1 (ver sección E2).
 - No se ha demostrado extracción durante lectura, resistencia a fallas de medio ni funcionamiento del hardware final.
-- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria por ahora. No hay lectura WAV, decodificación MP3, OLED, botones, USB MSC o Bluetooth.
+- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). **E3** reproducción WAV PCM 16 bits desde microSD por ruta BSP: PASS (placa, ver E3). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria: la Korvo reproduce con I2S estándar. No hay decodificación MP3, OLED, botones, USB MSC o Bluetooth.
 
 ## Ruta TDM ES8389 (plan B): compila, sin prueba en placa
 
@@ -98,6 +98,28 @@ Nota histórica: en una sesión anterior (Codex) no se pudo iniciar la compilaci
 - No probado: frecuencia medida con instrumento, música real, ruta PCM5102A del hardware final.
 - Decisión: la ruta TDM (`audio_korvo.c`, plan B) no es necesaria por ahora; se conserva como referencia.
 
+## E3 — Reproducción WAV desde microSD (ruta BSP)
+
+- Commit `55fa8b4`. Modo `CONFIG_POC_MODE_WAV`, ruta en `CONFIG_POC_WAV_PATH`. Build en `build_s31`: 0 errores, 0 warnings, binario `0x66180` (60 % libre). `main` requiere `PRIV_REQUIRES esp_timer`.
+- `core/wav_parser`: recorre chunks, salta `LIST`, respeta el padding de tamaños impares; acepta solo PCM 16 bits, 1–2 canales, 8–48 kHz. Pruebas host: "wav_parser tests passed" (Linux, gcc 13.3, `-Werror`). Además, los dos WAV reales de prueba dan `data_offset=78` (44 sin `LIST`): el salto de `LIST` funciona con archivos reales.
+- Archivos de prueba sintéticos (no música comercial): `TEST.WAV` 44100 Hz estéreo 30 s (La 440, escala, melodía, tono 660 Hz solo izquierdo, 880 Hz solo derecho); `MONO16K.WAV` 16000 Hz mono 10 s.
+- Lectura en una sola tarea, bloques de 4096 bytes, volumen fijo 45, mono duplicado a L/R.
+
+### Resultados en placa (PASS)
+
+| Prueba | Log | Observación |
+|---|---|---|
+| `TEST.WAV` | `frames=1323000 expected=1323000 elapsed=29980 ms duration=30000 ms ratio=0.999 max_read=2.9 ms` | Completo, sin cortes; La igual al de E2 |
+| `MONO16K.WAV` | `frames=160000 expected=160000 elapsed=9982 ms duration=10000 ms ratio=0.998 max_read=2.9 ms` | Completo, sin cortes, misma altura que `TEST.WAV` |
+| Archivo inexistente | "cannot open /sdcard/MUSIC/NOEXISTE.WAV" -> `ESP_ERR_NOT_FOUND` | Sin reinicio, altavoz en silencio |
+| MP3 como WAV (`Idilio.mp3`) | "WAV header rejected: ESP_ERR_INVALID_ARG" | Sin reinicio; códec no se abre |
+
+- Canales: con un solo altavoz se oyó el tono derecho y no el izquierdo -> el altavoz está en el canal derecho y la separación L/R es correcta.
+- I2S: el log muestra "STD: TX ... slot_mode: STEREO" y el reloj se reconfigura a 44100 y 16000 Hz: la Korvo reproduce con I2S estándar por la ruta BSP; TDM no es necesario.
+- Margen de lectura: 4096 bytes = 23 ms de audio a 44,1 kHz estéreo; lectura máxima 2,9 ms (~13 % del presupuesto).
+- `ratio < 1` es esperado: `esp_codec_dev_write` retorna al encolar en DMA.
+- No probado: retirar la tarjeta durante la reproducción, archivos de horas, música comercial, WAV de 24 bits reales (solo rechazo en host), ruta SPI/PCM5102A del hardware final.
+
 ## Próxima acción
 
-E3 — reproducir un WAV PCM desde `/sdcard/MUSIC` por la ruta BSP.
+E4 — decodificación MP3 con minimp3.
