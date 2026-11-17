@@ -4,7 +4,7 @@
 
 Validar en firmware el montaje de microSD proporcionado por el BSP y el inventario determinista de nombres `.mp3` dentro de `MUSIC`. La primera etapa no prueba reproducción de audio.
 
-La Korvo es una plataforma temporal: usa ESP32-S31, códec ES8389 y SDMMC. El hardware objetivo propuesto usa ESP32-S3-WROOM-1-N16R8, ES8388 por I²S y microSD por SPI. Por tanto, esta PoC no valida compatibilidad eléctrica, audio ni almacenamiento del producto final.
+La Korvo es una plataforma temporal: usa ESP32-S31, códec ES8389 y SDMMC. El hardware objetivo propuesto usa ESP32-S3-WROOM-1-N16R8, DAC PCM5102A + amplificador de audífonos TPA6138A2 por I²S y microSD por SPI. Por tanto, esta PoC no valida compatibilidad eléctrica, audio ni almacenamiento del producto final.
 
 ## Herramientas y versiones
 

@@ -1,0 +1,26 @@
+menu "MP3 Electronic Design PoC"
+
+choice POC_MODE
+    prompt "PoC application mode"
+    default POC_MODE_STORAGE
+
+config POC_MODE_STORAGE
+    bool "SD storage diagnostic"
+
+config POC_MODE_PCM
+    bool "ES8389 PCM tone test"
+
+config POC_MODE_TONE_BSP
+    bool "BSP speaker tone test (route A)"
+
+config POC_MODE_WAV
+    bool "WAV playback test (BSP route)"
+
+endchoice
+
+config POC_WAV_PATH
+    string "WAV file path"
+    default "/sdcard/MUSIC/TEST.WAV"
+    depends on POC_MODE_WAV
+
+endmenu
