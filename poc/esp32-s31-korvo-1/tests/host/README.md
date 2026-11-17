@@ -22,4 +22,18 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
 ./build-host/music_catalog_test
 ```
 
+## Player core (main/core)
+
+`main/core/` holds the portable C11 player logic: `volume`, `mute_sequencer`, `power_policy` and `player_core`. It returns ordered commands and never touches hardware or allocates memory. Each module has its own test:
+
+```sh
+for t in volume mute_sequencer power_policy; do
+  gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
+    main/core/$t.c tests/host/${t}_test.c -o build-host/${t}_test && ./build-host/${t}_test
+done
+gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
+  main/core/player_core.c main/core/volume.c tests/host/player_core_test.c \
+  -o build-host/player_core_test && ./build-host/player_core_test
+```
+
 Test fixtures are created under `build-host/` so they remain inside the project. Permission-denied iteration errors are difficult to reproduce reliably when tests run as an administrator/root. The scanner propagates `opendir`, `stat`, `readdir`, and `closedir` failures.
