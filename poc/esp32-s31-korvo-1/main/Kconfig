@@ -13,6 +13,14 @@ config POC_MODE_PCM
 config POC_MODE_TONE_BSP
     bool "BSP speaker tone test (route A)"
 
+config POC_MODE_WAV
+    bool "WAV playback test (BSP route)"
+
 endchoice
+
+config POC_WAV_PATH
+    string "WAV file path"
+    default "/sdcard/MUSIC/TEST.WAV"
+    depends on POC_MODE_WAV
 
 endmenu

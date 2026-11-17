@@ -35,6 +35,9 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
   main/core/tone_gen.c tests/host/tone_gen_test.c -lm \
   -o build-host/tone_gen_test && ./build-host/tone_gen_test
 gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
+  main/core/wav_parser.c tests/host/wav_parser_test.c \
+  -o build-host/wav_parser_test && ./build-host/wav_parser_test
+gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
   main/core/player_core.c main/core/volume.c tests/host/player_core_test.c \
   -o build-host/player_core_test && ./build-host/player_core_test
 ```
