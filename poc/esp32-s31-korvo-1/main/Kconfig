@@ -16,11 +16,19 @@ config POC_MODE_TONE_BSP
 config POC_MODE_WAV
     bool "WAV playback test (BSP route)"
 
+config POC_MODE_MP3
+    bool "MP3 playback test (minimp3, BSP route)"
+
 endchoice
 
 config POC_WAV_PATH
     string "WAV file path"
     default "/sdcard/MUSIC/TEST.WAV"
     depends on POC_MODE_WAV
+
+config POC_MP3_PATH
+    string "MP3 file path"
+    default "/sdcard/MUSIC/TEST.MP3"
+    depends on POC_MODE_MP3
 
 endmenu
