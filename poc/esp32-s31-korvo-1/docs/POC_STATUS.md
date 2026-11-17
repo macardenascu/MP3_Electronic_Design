@@ -59,12 +59,12 @@ El contrato documentado es que cualquier error deja el catálogo en cero. Antes,
 ## Estado y límites
 
 - **Host:** pruebas ejecutadas y pasadas, incluida regresión de fallo `opendir()`.
-- **ESP-IDF:** configuración LFN modificada; falta compilar este estado con ESP-IDF y verificar `sdkconfig` resultante.
-- **Hardware:** hito aceptado dentro del alcance SD-01 a SD-07 según log o confirmación del usuario. SD-08 aplazada por decisión del responsable; no es PASS físico. No se conserva en este checkout un log UART posterior que confirme la ausencia del warning LFN.
+- **ESP-IDF:** compilado con ESP-IDF 6.1 en `poc/esp32-s31-korvo-1/build_s31` en modo STORAGE y TONE_BSP; el binario flasheado para la prueba audible de E2.2 es el de `build_s31`. `build_tonebsp` fue una verificación previa de compilación del mismo commit. Ver E2.
+- **Hardware:** hito aceptado dentro del alcance SD-01 a SD-07 según log o confirmación del usuario. SD-08 aplazada por decisión del responsable; no es PASS físico. El pendiente LFN de SD-07 se cierra en E2.1: el aviso es un falso positivo del BSP 1.0.1 (ver sección E2).
 - No se ha demostrado extracción durante lectura, resistencia a fallas de medio ni funcionamiento del hardware final.
-- La nueva ruta de generación PCM está implementada localmente, pero aún no tiene build verificado ni prueba audible. No hay lectura WAV, decodificación MP3, OLED, botones, USB MSC o Bluetooth.
+- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria por ahora. No hay lectura WAV, decodificación MP3, OLED, botones, USB MSC o Bluetooth.
 
-## Salida PCM ES8389 (implementación local inicial; build y placa pendientes)
+## Ruta TDM ES8389 (plan B): compila, sin prueba en placa
 
 La inspección local confirmó ESP-IDF 6.1, BSP `espressif/esp32_s31_korvo_1` 1.0.1 y `esp_codec_dev` 1.5.11. El BSP inicializa I2S0 con `i2s_channel_init_std_mode()` y su helper `bsp_audio_codec_speaker_init()` hereda esa configuración. En el driver ES8389 local, `set_fs()` llama a `es8389_config_fmt(..., ES_I2S_NORMAL)`. Por ello el helper BSP no se usa para la prueba TDM.
 
@@ -76,8 +76,28 @@ El firmware ofrece `CONFIG_POC_MODE_STORAGE` (predeterminado) y `CONFIG_POC_MODE
 
 La implementación actual usa las señales del BSP (BCLK GPIO3, WS GPIO4, DOUT GPIO5; sin salida MCLK) y mantiene el canal I2S0 en READY para que `esp_codec_dev` pueda reconfigurar TDM durante `open()`. Después de abrir se fuerza/verifica el formato DSP-A del ES8389 por la interfaz pública de registros y se devuelve el canal a PCM-short antes de transmitir. Se usa un frame de cuatro slots de 16 bits; todos los slots reciben la misma muestra y el DAC S2P se selecciona en slot 0. Esta elección resuelve la discrepancia de formato entre el helper estándar del BSP/driver ES8389 y TDM, pero requiere confirmación física.
 
-En este entorno no se pudo iniciar una compilación nueva: el export de ESP-IDF 6.1 informó que falta `C:\Users\mateo\.espressif\python_env\idf6.1_py3.14_env\Scripts\python.exe`. No se instaló ni modificó ninguna herramienta. La compilación histórica del modo SD no verifica esta implementación PCM.
+`audio_korvo.c` forma parte de `SRCS` y se compila dentro de los builds de E2.1 y E2.2 (aparece `audio_korvo.c.obj`), pero el modo `CONFIG_POC_MODE_PCM` nunca se ha ejecutado en la placa.
+
+Nota histórica: en una sesión anterior (Codex) no se pudo iniciar la compilación porque el export de ESP-IDF 6.1 informó que faltaba `C:\Users\mateo\.espressif\python_env\idf6.1_py3.14_env\Scripts\python.exe`.
+
+## E2 — Salida de audio (ruta BSP)
+
+### E2.1 Regresión de almacenamiento — PASS (placa)
+
+- Build en `poc/esp32-s31-korvo-1/build_s31`, ESP-IDF 6.1 `--preview`, target `esp32s31`: binario `0x4df80`, 70 % libre.
+- Log de placa con App version `rev-a-5-g1a0203f`: SD montada, `MUSIC` con 4 pistas (incluido el nombre largo).
+- LFN: el aviso "Long filenames on SD card are disabled" es un falso positivo del BSP 1.0.1. `src/bsp_storage.c` comprueba `CONFIG_FATFS_LONG_FILENAMES`, que no existe en nuestro `sdkconfig`; el `sdkconfig` tiene `CONFIG_FATFS_LFN_HEAP=y` y `CONFIG_FATFS_MAX_LFN=255`, y el nombre largo se muestra completo. Con esto se cierra el pendiente de LFN de SD-07.
+
+### E2.2 Tono por ruta BSP — PASS (placa, observación auditiva del responsable)
+
+- Commit `ea8a0d7`. Modo `CONFIG_POC_MODE_TONE_BSP`. Build 2156/2156 sin warnings, binario `0x4a150`, 71 % libre.
+- `bsp_audio_codec_speaker_init()` + `esp_codec_dev` 1.5.11, 16 kHz, 16 bits, estéreo, 440 Hz, pico 25 %.
+- Escalera de volumen 30/45/60: los tres audibles, volumen creciente, sin distorsión, clics ni pops, tono estable. Altavoz pasivo 4 Ω / 3 W en un conector de la Korvo.
+- Log: "Open codec device OK", tones 1/3..3/3, "BSP tone test finished"; duración 353 ms -> 8413 ms (8,06 s) frente a 8 s esperados, coherente con un reloj I2S correcto.
+- Prueba host `tone_gen_test`: OK (440 cruces por cero ascendentes en 1 s), ejecutada en Linux gcc 13.3.
+- No probado: frecuencia medida con instrumento, música real, ruta PCM5102A del hardware final.
+- Decisión: la ruta TDM (`audio_korvo.c`, plan B) no es necesaria por ahora; se conserva como referencia.
 
 ## Próxima acción
 
-SD-08 queda fuera del cierre actual por decisión del responsable; la prueba host mantiene cobertura del filtrado case-insensitive. Como verificación futura opcional, registrar un arranque posterior con LFN para comprobar la ausencia del warning. El siguiente hito es la salida de audio PCM, sin que esto equivalga a reproducción WAV/MP3.
+E3 — reproducir un WAV PCM desde `/sdcard/MUSIC` por la ruta BSP.
