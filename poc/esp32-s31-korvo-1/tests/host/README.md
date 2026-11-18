@@ -45,6 +45,16 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
   -o build-host/player_core_test && ./build-host/player_core_test
 ```
 
+## Korvo audio capabilities (main/korvo_audio_caps.c)
+
+`korvo_audio_caps_test` checks the sample rates the Korvo BSP speaker path can clock (ES8389 without MCLK, 16 bits: 8000, 16000, 44100, 48000 Hz) and that others such as 22050 and 11025 Hz are rejected:
+
+```sh
+gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
+  main/korvo_audio_caps.c tests/host/korvo_audio_caps_test.c \
+  -o build-host/korvo_audio_caps_test && ./build-host/korvo_audio_caps_test
+```
+
 ## MP3 decoder (main/decoder)
 
 `mp3_decoder_test` covers the ID3v2 syncsafe size (including the footer flag), an empty file, a tag larger than the input buffer, a truncated tag, random data (`ESP_ERR_NOT_SUPPORTED`) and a failing read callback (`ESP_FAIL`). It does not decode real audio.

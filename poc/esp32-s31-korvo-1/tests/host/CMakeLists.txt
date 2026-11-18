@@ -19,6 +19,11 @@ if(NOT MSVC)
     target_link_libraries(tone_gen_test PRIVATE m) # sin()/lround()
 endif()
 
+# Korvo board audio capabilities (main/korvo_audio_caps.c).
+add_executable(korvo_audio_caps_test korvo_audio_caps_test.c ../../main/korvo_audio_caps.c)
+target_include_directories(korvo_audio_caps_test PRIVATE include ../../main)
+target_compile_options(korvo_audio_caps_test PRIVATE -Wall -Wextra -Werror)
+
 # MP3 decoder wrapper (main/decoder) around the vendored, unmodified minimp3.
 set(DECODER_DIR ../../main/decoder)
 set(MINIMP3_DIR ../../main/third_party/minimp3)

@@ -15,6 +15,7 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "korvo_audio_caps.h"
 #include "mp3_decoder.h"
 #include "storage_korvo.h"
 
@@ -110,6 +111,11 @@ static esp_err_t play(FILE *f, mp3_stats_t *st, uint32_t *rate_out)
     printf("[MP3] file=%s, rate=%" PRIu32 ", ch=%" PRIu32 ", bitrate=%" PRIu32 " kbps\n",
            s_path, info.sample_rate, info.channels, info.bitrate_kbps);
 
+    if (!korvo_audio_rate_supported(info.sample_rate)) {
+        ESP_LOGE(TAG, "sample rate %u Hz not supported by ES8389 without MCLK on Korvo (no coeff entry)",
+                 (unsigned)info.sample_rate);
+        return ESP_ERR_NOT_SUPPORTED; /* mp3_task closes the file */
+    }
     esp_codec_dev_handle_t spk = bsp_audio_codec_speaker_init();
     if (spk == NULL) {
         ESP_LOGE(TAG, "bsp_audio_codec_speaker_init returned NULL");

@@ -11,6 +11,7 @@
 #include "esp_codec_dev.h"
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "korvo_audio_caps.h"
 #include "storage_korvo.h"
 #include "wav_parser.h"
 
@@ -125,6 +126,12 @@ esp_err_t audio_bsp_wav_run(const char *path)
            path, info.sample_rate, (unsigned)info.channels, (unsigned)info.bits_per_sample, info.data_size,
            (uint64_t)(info.data_size / frame_bytes) * 1000u / info.sample_rate);
 
+    if (!korvo_audio_rate_supported(info.sample_rate)) {
+        ESP_LOGE(TAG, "sample rate %u Hz not supported by ES8389 without MCLK on Korvo (no coeff entry)",
+                 (unsigned)info.sample_rate);
+        fclose(f);
+        return ESP_ERR_NOT_SUPPORTED;
+    }
     esp_codec_dev_handle_t spk = bsp_audio_codec_speaker_init();
     if (spk == NULL) {
         ESP_LOGE(TAG, "bsp_audio_codec_speaker_init returned NULL");
