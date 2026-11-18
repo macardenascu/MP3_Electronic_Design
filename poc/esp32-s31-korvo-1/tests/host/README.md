@@ -68,6 +68,21 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
   -o build-host/battery_sim_test && ./build-host/battery_sim_test
 ```
 
+## UI (E6/E8)
+
+`ui_model_test` covers the 128x64 SSD1306-layout framebuffer and clipping, name scrolling (offset at 0, 1000, 1300 and 1600 ms, restart of each lap), centered short names without extension, `mm:ss`, the volume bar at min/middle/max, the 2 s message, screen off after 10 s, the first button press discarded while off, a message waking the screen, and that every player message fits in 16 characters. `ui_preview` writes `ui_<case>.pbm` (P4, 128x64) for: short track playing, long name at t=0 and t=2000 ms, paused, max volume, "No soportado", "Bateria baja" and empty catalog:
+
+```sh
+gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
+  main/core/ui_render.c main/core/ui_model.c tests/host/ui_model_test.c \
+  -o build-host/ui_model_test && ./build-host/ui_model_test
+gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
+  main/core/ui_render.c main/core/ui_model.c tests/host/ui_preview.c -o build-host/ui_preview
+(cd build-host && ./ui_preview)
+```
+
+The 8x8 font is public domain; see `main/core/FONT_LICENSE.md`.
+
 ## MP3 decoder (main/decoder)
 
 `mp3_decoder_test` covers the ID3v2 syncsafe size (including the footer flag), an empty file, a tag larger than the input buffer, a truncated tag, random data (`ESP_ERR_NOT_SUPPORTED`) and a failing read callback (`ESP_FAIL`). It does not decode real audio.

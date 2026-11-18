@@ -59,10 +59,10 @@ El contrato documentado es que cualquier error deja el catálogo en cero. Antes,
 ## Estado y límites
 
 - **Host:** pruebas ejecutadas y pasadas, incluida regresión de fallo `opendir()`.
-- **ESP-IDF:** compilado con ESP-IDF 6.1 en `poc/esp32-s31-korvo-1/build_s31`, donde se compilaron y ejecutaron en placa los modos STORAGE, TONE_BSP, WAV, MP3 y PLAYER; los binarios flasheados para las pruebas de E2.2, E3, E4 y E5/E7 son los de `build_s31`. `build_tonebsp` fue una verificación previa de compilación del commit de E2.2. Ver E2, E3, E4 y E5/E7.
+- **ESP-IDF:** compilado con ESP-IDF 6.1 en `poc/esp32-s31-korvo-1/build_s31`, donde se compilaron y ejecutaron en placa los modos STORAGE, TONE_BSP, WAV, MP3 y PLAYER; los binarios flasheados para las pruebas de E2.2, E3, E4, E5/E7 y E6/E8 son los de `build_s31` (E6/E8 con PSRAM activada). `build_tonebsp` fue una verificación previa de compilación del commit de E2.2. Ver E2, E3, E4, E5/E7 y E6/E8.
 - **Hardware:** hito aceptado dentro del alcance SD-01 a SD-07 según log o confirmación del usuario. SD-08 aplazada por decisión del responsable; no es PASS físico. El pendiente LFN de SD-07 se cierra en E2.1: el aviso es un falso positivo del BSP 1.0.1 (ver sección E2).
 - No se ha demostrado extracción durante lectura, resistencia a fallas de medio ni funcionamiento del hardware final.
-- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). **E3** reproducción WAV PCM 16 bits desde microSD por ruta BSP: PASS (placa, ver E3). **E4** reproducción MP3 con minimp3 desde microSD por ruta BSP: PASS (placa, ver E4); en la Korvo solo 8000, 16000, 44100 y 48000 Hz (las demás se rechazan con `ESP_ERR_NOT_SUPPORTED`). **E5/E7** reproductor con catálogo, botones y corte por batería simulado: PASS (placa, ver E5/E7). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria: la Korvo reproduce con I2S estándar. No hay OLED, USB MSC ni Bluetooth; batería real y botones GPIO de la PCB no probados.
+- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). **E3** reproducción WAV PCM 16 bits desde microSD por ruta BSP: PASS (placa, ver E3). **E4** reproducción MP3 con minimp3 desde microSD por ruta BSP: PASS (placa, ver E4); en la Korvo solo 8000, 16000, 44100 y 48000 Hz (las demás se rechazan con `ESP_ERR_NOT_SUPPORTED`). **E5/E7** reproductor con catálogo, botones y corte por batería simulado: PASS (placa, ver E5/E7). **E6/E8** interfaz en OLED virtual 128x64 y apagado de pantalla por inactividad: PASS (placa, ver E6/E8). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria: la Korvo reproduce con I2S estándar. No hay USB MSC ni Bluetooth; batería real, botones GPIO y OLED SSD1306 de la PCB no probados.
 
 ## Ruta TDM ES8389 (plan B): compila, sin prueba en placa
 
@@ -175,6 +175,34 @@ Regresión de `TEST.MP3` tras el arreglo (cubierta por la prueba host de la list
 - Saturación del volumen verificada en host.
 - En la Korvo la etapa AMP del anti-pop es no-op y no hay corte real de alimentación.
 - Batería real (BAT_ADC, IO1) y botones GPIO de la PCB no probados.
+
+## E6/E8 — Interfaz (OLED virtual 128x64) y ahorro de energía
+
+- Commit `fc9fce8`. Framebuffer portable 128x64 de 1 bit con layout SSD1306 (`core/ui_render`, `core/ui_model`, fuente font8x8 de dominio público, commit `8e279d2`). En la Korvo se muestra ampliado x3 en la LCD 800x480 RGB565 (`bsp_display_new` + `esp_lcd_panel_draw_bitmap` por franjas, solo páginas cambiadas), blanco sobre negro, más un panel de diagnóstico a color solo-Korvo.
+- Host: "ui_model tests passed" (Linux gcc 13.3 y MSYS2); `ui_preview` generó 8 pantallas revisadas antes de flashear.
+- PSRAM: requerida por el framebuffer RGB (768 KB). Configuración: `SPIRAM=y`, modo octal; velocidad 200 MHz (por defecto). Log: "Found 16MB PSRAM device", "Speed: 200MHz", "SPI SRAM memory test OK". XIP/RODATA desde PSRAM no habilitados.
+
+### Resultados en placa (PASS, log + observación del responsable)
+
+- OLED virtual igual a las previsualizaciones.
+- Nombre largo con desplazamiento fluido; el tiempo avanza cada segundo.
+- Panel de diagnóstico con datos.
+- Sin cortes de audio durante los redibujos; respuesta inmediata a botones.
+- "No soportado" al saltar `MONO22K.MP3`.
+- E8: pantalla "apagada" tras 10 s sin botones; el primer botón solo despierta ("wake (button press discarded)"); los mensajes despiertan la pantalla.
+- Batería baja: el audio se apaga primero (shutdown del motor) y después "Bateria baja" -> "Apagando..." -> pantalla en negro; verificado también con la pantalla previamente apagada.
+
+### Límites
+
+- En la Korvo la retroiluminación no es controlable (`BSP_LCD_BACKLIGHT` = NC), así que el apagado es solo visual (sin ahorro real); en una OLED los píxeles apagados sí ahorran. Consumo no medido.
+- Pila de la tarea `ui` no medida (sin desbordamiento observado).
+- La UI muestra los guiones bajos del nombre de archivo tal cual.
+
+Evidencia adicional: el responsable grabó videos de las pruebas (enlaces pendientes de añadir).
+
+## Trabajo futuro
+
+- Modo carga por WiFi (subir MP3 a la microSD desde un navegador), activado solo bajo demanda; portable al ESP32-S3 sin cambios de hardware. No implementado.
 
 ## Próxima acción
 

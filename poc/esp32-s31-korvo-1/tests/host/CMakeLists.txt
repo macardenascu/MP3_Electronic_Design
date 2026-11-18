@@ -32,6 +32,13 @@ add_executable(battery_sim_test battery_sim_test.c ${CORE_DIR}/battery_sim.c ${C
 target_include_directories(battery_sim_test PRIVATE include ${CORE_DIR})
 target_compile_options(battery_sim_test PRIVATE -Wall -Wextra -Werror)
 
+# UI model and renderer (E6/E8): test and PBM preview tool.
+foreach(name IN ITEMS ui_model_test ui_preview)
+    add_executable(${name} ${name}.c ${CORE_DIR}/ui_model.c ${CORE_DIR}/ui_render.c)
+    target_include_directories(${name} PRIVATE include ${CORE_DIR})
+    target_compile_options(${name} PRIVATE -Wall -Wextra -Werror)
+endforeach()
+
 # MP3 decoder wrapper (main/decoder) around the vendored, unmodified minimp3.
 set(DECODER_DIR ../../main/decoder)
 set(MINIMP3_DIR ../../main/third_party/minimp3)
