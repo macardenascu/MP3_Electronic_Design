@@ -18,3 +18,20 @@ target_sources(player_core_test PRIVATE ${CORE_DIR}/volume.c)
 if(NOT MSVC)
     target_link_libraries(tone_gen_test PRIVATE m) # sin()/lround()
 endif()
+
+# Korvo board audio capabilities (main/korvo_audio_caps.c).
+add_executable(korvo_audio_caps_test korvo_audio_caps_test.c ../../main/korvo_audio_caps.c)
+target_include_directories(korvo_audio_caps_test PRIVATE include ../../main)
+target_compile_options(korvo_audio_caps_test PRIVATE -Wall -Wextra -Werror)
+
+# MP3 decoder wrapper (main/decoder) around the vendored, unmodified minimp3.
+set(DECODER_DIR ../../main/decoder)
+set(MINIMP3_DIR ../../main/third_party/minimp3)
+foreach(name IN ITEMS mp3_decoder_test mp3_to_wav)
+    add_executable(${name} ${name}.c ${DECODER_DIR}/mp3_decoder.c)
+    target_include_directories(${name} PRIVATE include ${DECODER_DIR} ${MINIMP3_DIR})
+    target_compile_options(${name} PRIVATE -Wall -Wextra -Werror)
+    if(NOT MSVC)
+        target_link_libraries(${name} PRIVATE m)
+    endif()
+endforeach()
