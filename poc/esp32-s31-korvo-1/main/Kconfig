@@ -19,6 +19,9 @@ config POC_MODE_WAV
 config POC_MODE_MP3
     bool "MP3 playback test (minimp3, BSP route)"
 
+config POC_MODE_PLAYER
+    bool "Player: catalog + buttons (E5/E7)"
+
 endchoice
 
 config POC_WAV_PATH
