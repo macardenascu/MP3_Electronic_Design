@@ -11,6 +11,7 @@
 #include "bsp/esp32_s31_korvo_1.h"
 #include "esp_codec_dev.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
@@ -59,6 +60,42 @@ static int16_t s_stereo[MINIMP3_MAX_SAMPLES_PER_FRAME];
 static int16_t s_zeros[ENGINE_ZERO_FRAMES * ENGINE_OUT_CHANNELS];
 static size_t s_pending_spc; /* first frame decoded during OPEN, not yet written */
 static engine_cmd_t s_cmd;   /* receive buffer, keeps 300+ bytes off the stack */
+
+/* Diagnostics only (E6/E8): written by the engine task, read by the UI task. */
+static portMUX_TYPE s_stats_lock = portMUX_INITIALIZER_UNLOCKED;
+static uint32_t s_stat_bitrate;
+static uint64_t s_stat_decode_total_us;
+static uint32_t s_stat_decode_count;
+static uint32_t s_stat_decode_max_us;
+
+static void stats_reset(void)
+{
+    taskENTER_CRITICAL(&s_stats_lock);
+    s_stat_bitrate = 0;
+    s_stat_decode_total_us = 0;
+    s_stat_decode_count = 0;
+    s_stat_decode_max_us = 0;
+    taskEXIT_CRITICAL(&s_stats_lock);
+}
+
+static void stats_add(int64_t dt_us, uint32_t bitrate_kbps)
+{
+    taskENTER_CRITICAL(&s_stats_lock);
+    s_stat_decode_total_us += (uint64_t)dt_us;
+    s_stat_decode_count++;
+    if ((uint32_t)dt_us > s_stat_decode_max_us) s_stat_decode_max_us = (uint32_t)dt_us;
+    if (bitrate_kbps) s_stat_bitrate = bitrate_kbps;
+    taskEXIT_CRITICAL(&s_stats_lock);
+}
+
+/* mp3_decoder_next() with its duration recorded for the diagnostics panel. */
+static esp_err_t decode_timed(mp3_frame_info_t *info, size_t *spc)
+{
+    const int64_t t0 = esp_timer_get_time();
+    const esp_err_t err = mp3_decoder_next(&s_dec, s_pcm, info, spc);
+    stats_add(esp_timer_get_time() - t0, err == ESP_OK && *spc ? info->bitrate_kbps : 0);
+    return err;
+}
 
 static void notify(audio_engine_event_t evt, esp_err_t err)
 {
@@ -143,7 +180,8 @@ static void do_open(const char *path)
     esp_err_t err = mp3_decoder_init(&s_dec, file_read, s_file);
     mp3_frame_info_t info = {0};
     size_t spc = 0;
-    if (err == ESP_OK) err = mp3_decoder_next(&s_dec, s_pcm, &info, &spc);
+    stats_reset();
+    if (err == ESP_OK) err = decode_timed(&info, &spc);
     if (err == ESP_OK && spc == 0) err = ESP_ERR_NOT_FOUND; /* no audio frame */
     if (err == ESP_OK && !korvo_audio_rate_supported(info.sample_rate)) {
         ESP_LOGE(TAG, "sample rate %u Hz not supported by ES8389 without MCLK on Korvo (no coeff entry)",
@@ -227,7 +265,7 @@ static void play_one_frame(void)
     s_pending_spc = 0;
     if (spc == 0) {
         mp3_frame_info_t info;
-        const esp_err_t err = mp3_decoder_next(&s_dec, s_pcm, &info, &spc);
+        const esp_err_t err = decode_timed(&info, &spc);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "decode failed after %" PRIu32 " frames: %s", mp3_decoder_frames(&s_dec),
                      esp_err_to_name(err));
@@ -328,4 +366,15 @@ uint32_t audio_engine_position_ms(void)
     const uint32_t rate = s_rate;
     const uint64_t samples = s_samples_played;
     return rate ? (uint32_t)(samples * 1000u / rate) : 0; /* 64-bit product avoids overflow */
+}
+
+void audio_engine_get_stats(audio_engine_stats_t *out)
+{
+    taskENTER_CRITICAL(&s_stats_lock);
+    out->bitrate_kbps = s_stat_bitrate;
+    out->decode_avg_us = s_stat_decode_count ? (uint32_t)(s_stat_decode_total_us / s_stat_decode_count) : 0;
+    out->decode_max_us = s_stat_decode_max_us;
+    taskEXIT_CRITICAL(&s_stats_lock);
+    out->sample_rate = s_rate;
+    out->channels = s_channels;
 }
