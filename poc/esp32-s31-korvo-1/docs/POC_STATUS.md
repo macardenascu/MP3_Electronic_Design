@@ -59,10 +59,10 @@ El contrato documentado es que cualquier error deja el catálogo en cero. Antes,
 ## Estado y límites
 
 - **Host:** pruebas ejecutadas y pasadas, incluida regresión de fallo `opendir()`.
-- **ESP-IDF:** compilado con ESP-IDF 6.1 en `poc/esp32-s31-korvo-1/build_s31`, donde se compilaron y ejecutaron en placa los modos STORAGE, TONE_BSP, WAV y MP3; los binarios flasheados para las pruebas de E2.2, E3 y E4 son los de `build_s31`. `build_tonebsp` fue una verificación previa de compilación del commit de E2.2. Ver E2, E3 y E4.
+- **ESP-IDF:** compilado con ESP-IDF 6.1 en `poc/esp32-s31-korvo-1/build_s31`, donde se compilaron y ejecutaron en placa los modos STORAGE, TONE_BSP, WAV, MP3 y PLAYER; los binarios flasheados para las pruebas de E2.2, E3, E4 y E5/E7 son los de `build_s31`. `build_tonebsp` fue una verificación previa de compilación del commit de E2.2. Ver E2, E3, E4 y E5/E7.
 - **Hardware:** hito aceptado dentro del alcance SD-01 a SD-07 según log o confirmación del usuario. SD-08 aplazada por decisión del responsable; no es PASS físico. El pendiente LFN de SD-07 se cierra en E2.1: el aviso es un falso positivo del BSP 1.0.1 (ver sección E2).
 - No se ha demostrado extracción durante lectura, resistencia a fallas de medio ni funcionamiento del hardware final.
-- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). **E3** reproducción WAV PCM 16 bits desde microSD por ruta BSP: PASS (placa, ver E3). **E4** reproducción MP3 con minimp3 desde microSD por ruta BSP: PASS (placa, ver E4); en la Korvo solo 8000, 16000, 44100 y 48000 Hz (las demás se rechazan con `ESP_ERR_NOT_SUPPORTED`). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria: la Korvo reproduce con I2S estándar. No hay reproductor con catálogo, OLED, botones, USB MSC o Bluetooth.
+- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). **E3** reproducción WAV PCM 16 bits desde microSD por ruta BSP: PASS (placa, ver E3). **E4** reproducción MP3 con minimp3 desde microSD por ruta BSP: PASS (placa, ver E4); en la Korvo solo 8000, 16000, 44100 y 48000 Hz (las demás se rechazan con `ESP_ERR_NOT_SUPPORTED`). **E5/E7** reproductor con catálogo, botones y corte por batería simulado: PASS (placa, ver E5/E7). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria: la Korvo reproduce con I2S estándar. No hay OLED, USB MSC ni Bluetooth; batería real y botones GPIO de la PCB no probados.
 
 ## Ruta TDM ES8389 (plan B): compila, sin prueba en placa
 
@@ -148,6 +148,34 @@ Nota histórica: en una sesión anterior (Codex) no se pudo iniciar la compilaci
 
 Regresión de `TEST.MP3` tras el arreglo (cubierta por la prueba host de la lista); archivo no-MP3 en modo MP3; MP3 VBR, MPEG-2.5, archivos dañados, retirar la tarjeta durante la reproducción.
 
+## E5/E7 — Reproductor con catálogo, botones y corte por batería simulado
+
+- Commits `f238764` (implementación) y `984ca1c`, que eliminó el placeholder `main/player_core.h`: sombreaba a `core/player_core.h` desde `main/` y causó el primer fallo de build. Las pruebas host no lo detectaron porque solo incluían `main/core`.
+- Arquitectura: tarea `player` (8 KB) con cola de eventos. Productores: botones (`bsp_iot_button_create`, espressif/button 4.2.2, escalera ADC), motor de audio y temporizador de batería. `core/player_core` decide; la tarea `audio_engine` (32 KB) ejecuta OPEN/PAUSE/RESUME/CLOSE/RESTART/SET_VOLUME/SHUTDOWN entre frames. Un contador `gen` descarta eventos de pistas ya abandonadas.
+- Botones: SET corto = play/pausa; SET largo = batería simulada; MODE corto = siguiente; MODE largo = anterior; VOL+/VOL-.
+- Volumen: el core trabaja en dB (-60..-12, paso 2, inicio -30); en la Korvo, lineal -60 dB -> 0 %, -12 dB -> 60 % (`korvo_volume`).
+- Host: "korvo_volume tests passed"; `battery_sim`: LOW_BATTERY en el tick 15 (3400 mV), una sola vez.
+
+### Resultados en placa (PASS, log + observación del responsable)
+
+- Catálogo de 6 pistas y arranque automático a -30 dB / 38 %.
+- NEXT con vuelta 6 -> 1.
+- `MONO22K.MP3` saltada con `ESP_ERR_NOT_SUPPORTED`.
+- Cambio 48 / 44,1 / 48 kHz con reapertura del códec.
+- PREV a 4776 y 11376 ms reinicia la pista; a 2016 ms va a la pista anterior.
+- Pulsaciones largas sin disparar la corta.
+- 2 ciclos de pausa sin zumbido ni pop.
+- Volumen hasta -12 dB / 60 %.
+- Batería simulada 3700 -> 3400 mV, LOW_BATTERY, "shutdown: file and codec closed", "orderly shutdown complete" (coincide con la predicción host).
+
+### Avisos y límites
+
+- "i2s_channel_disable: the channel has not been enabled yet" al cambiar de frecuencia: benigno, la reapertura funciona.
+- Pila de la tarea `player` no medida (sin desbordamiento observado).
+- Saturación del volumen verificada en host.
+- En la Korvo la etapa AMP del anti-pop es no-op y no hay corte real de alimentación.
+- Batería real (BAT_ADC, IO1) y botones GPIO de la PCB no probados.
+
 ## Próxima acción
 
-E5 — reproductor con catálogo, `player_core` y botones.
+Firmware para la PCB Rev A: capa de placa ESP32-S3 (SD por SPI, PCM5102A por I2S con XSMT/AMP_MUTE_N, botones GPIO con antirrebote, BAT_ADC).
