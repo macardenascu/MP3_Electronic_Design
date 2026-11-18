@@ -1,5 +1,9 @@
 # Estado de la PoC ESP32-S31-Korvo-1
 
+## Evidencia en video
+
+[3 videos de pruebas en la ESP32-S31-Korvo-1 grabados por el responsable](https://drive.google.com/drive/folders/1Tq-jJcRcQZm7ZzIBcm1W4Nzm8Wph00uq?usp=sharing)
+
 ## Alcance
 
 Esta etapa valida el montaje microSD y el inventario inmediato de archivos MP3 en `MUSIC` mediante el BSP de la Korvo. No implementa reproducción. El hardware de prueba usa ESP32-S31, ES8389 y SDMMC; el producto objetivo ESP32-S3, DAC PCM5102A + amplificador de audífonos TPA6138A2 y microSD SPI requiere validación independiente.
@@ -191,6 +195,16 @@ Regresión de `TEST.MP3` tras el arreglo (cubierta por la prueba host de la list
 - "No soportado" al saltar `MONO22K.MP3`.
 - E8: pantalla "apagada" tras 10 s sin botones; el primer botón solo despierta ("wake (button press discarded)"); los mensajes despiertan la pantalla.
 - Batería baja: el audio se apaga primero (shutdown del motor) y después "Bateria baja" -> "Apagando..." -> pantalla en negro; verificado también con la pantalla previamente apagada.
+- El panel de diagnóstico muestra el bitrate del frame actual: `Formidable.mp3` mostró 192 kbps en la foto frente a 64 kbps del primer frame en el log de E4, coherente con un archivo VBR (no verificado).
+- La foto muestra decode avg 3,08 ms / max 7,16 ms con la UI activa (E4 sin UI: 2,82 / 6,81 ms).
+
+![Previsualización de la UI](img/ui_preview.png)
+
+*Previsualización generada en el PC (host) con el mismo código de ui_model/ui_render que corre en la placa; no es una fotografía. Las 8 pantallas son las verificadas antes de flashear.*
+
+![Foto de la UI en la Korvo](img/korvo_ui_photo.jpg)
+
+*Fotograma de un video de la prueba en la ESP32-S31-Korvo-1 (OLED virtual en la LCD).*
 
 ### Límites
 
@@ -198,7 +212,7 @@ Regresión de `TEST.MP3` tras el arreglo (cubierta por la prueba host de la list
 - Pila de la tarea `ui` no medida (sin desbordamiento observado).
 - La UI muestra los guiones bajos del nombre de archivo tal cual.
 
-Evidencia adicional: el responsable grabó videos de las pruebas (enlaces pendientes de añadir).
+Evidencia adicional: el responsable grabó videos de las pruebas (ver [Evidencia en video](#evidencia-en-video)).
 
 ## Trabajo futuro
 
