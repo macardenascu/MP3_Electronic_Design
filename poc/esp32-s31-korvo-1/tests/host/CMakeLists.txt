@@ -24,6 +24,14 @@ add_executable(korvo_audio_caps_test korvo_audio_caps_test.c ../../main/korvo_au
 target_include_directories(korvo_audio_caps_test PRIVATE include ../../main)
 target_compile_options(korvo_audio_caps_test PRIVATE -Wall -Wextra -Werror)
 
+# Korvo volume mapping and simulated battery (E5/E7).
+add_executable(korvo_volume_test korvo_volume_test.c ../../main/korvo_volume.c)
+target_include_directories(korvo_volume_test PRIVATE include ../../main)
+target_compile_options(korvo_volume_test PRIVATE -Wall -Wextra -Werror)
+add_executable(battery_sim_test battery_sim_test.c ${CORE_DIR}/battery_sim.c ${CORE_DIR}/power_policy.c)
+target_include_directories(battery_sim_test PRIVATE include ${CORE_DIR})
+target_compile_options(battery_sim_test PRIVATE -Wall -Wextra -Werror)
+
 # MP3 decoder wrapper (main/decoder) around the vendored, unmodified minimp3.
 set(DECODER_DIR ../../main/decoder)
 set(MINIMP3_DIR ../../main/third_party/minimp3)

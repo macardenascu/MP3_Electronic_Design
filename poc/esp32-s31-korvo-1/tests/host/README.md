@@ -55,6 +55,19 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
   -o build-host/korvo_audio_caps_test && ./build-host/korvo_audio_caps_test
 ```
 
+## Player pieces (E5/E7)
+
+`korvo_volume_test` checks the dB-to-percent mapping (-60 dB -> 0 %, -12 dB -> 60 %, linear, rounded, saturating). `battery_sim_test` chains the simulated battery (3700 mV, -20 mV/tick) with `power_policy` (cutoff 3500 mV, hysteresis 100 mV, 5 readings), prints the tick where LOW_BATTERY fires and checks it fires once:
+
+```sh
+gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
+  main/korvo_volume.c tests/host/korvo_volume_test.c \
+  -o build-host/korvo_volume_test && ./build-host/korvo_volume_test
+gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
+  main/core/battery_sim.c main/core/power_policy.c tests/host/battery_sim_test.c \
+  -o build-host/battery_sim_test && ./build-host/battery_sim_test
+```
+
 ## MP3 decoder (main/decoder)
 
 `mp3_decoder_test` covers the ID3v2 syncsafe size (including the footer flag), an empty file, a tag larger than the input buffer, a truncated tag, random data (`ESP_ERR_NOT_SUPPORTED`) and a failing read callback (`ESP_FAIL`). It does not decode real audio.

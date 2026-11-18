@@ -6,6 +6,7 @@
 #include "audio_bsp_tone.h"
 #include "audio_bsp_wav.h"
 #include "audio_bsp_mp3.h"
+#include "player_app.h"
 #if !CONFIG_POC_MODE_PCM && !CONFIG_POC_MODE_TONE_BSP
 #include "storage_korvo.h"
 #endif
@@ -14,8 +15,9 @@
 #endif
 
 static const char *TAG = "player";
-/* Keep the fixed-capacity catalogue out of app_main's task stack. */
-#if !CONFIG_POC_MODE_PCM && !CONFIG_POC_MODE_TONE_BSP && !CONFIG_POC_MODE_WAV && !CONFIG_POC_MODE_MP3
+/* Keep the fixed-capacity catalogue out of app_main's task stack. The player mode owns its own. */
+#if !CONFIG_POC_MODE_PCM && !CONFIG_POC_MODE_TONE_BSP && !CONFIG_POC_MODE_WAV && !CONFIG_POC_MODE_MP3 && \
+    !CONFIG_POC_MODE_PLAYER
 static music_catalog_t s_catalog;
 #endif
 
@@ -42,6 +44,9 @@ void app_main(void)
     if (mp3_err != ESP_OK) {
         ESP_LOGE(TAG, "MP3 playback task not started: %s", esp_err_to_name(mp3_err));
     }
+#elif CONFIG_POC_MODE_PLAYER
+    /* Mounts, scans and starts the player and engine tasks; app_main returns. */
+    player_app_run();
 #else
     printf("[PLAYER] Starting...\n");
     printf("[PLATFORM] ESP32-S31-Korvo-1\n");

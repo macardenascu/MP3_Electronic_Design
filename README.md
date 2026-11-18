@@ -4,7 +4,7 @@
 
 A university engineering project exploring a dedicated, offline music player: local audio files, physical controls, and a focused interface without streaming services or smartphone dependency.
 
-> **Status:** firmware proof of concept (PoC) in progress, and custom PCB **Rev A design frozen** (schematics and layout complete with test points, ERC/DRC clean, reviewed by the instructor). On the ESP32-S31-Korvo-1 PoC board, SD storage is validated and WAV and MP3 files play audibly from the microSD card. Controls and UI are pending, and the custom hardware (PCB Rev A) is **not yet validated**.
+> **Status:** firmware proof of concept (PoC) in progress, and custom PCB **Rev A design frozen** (schematics and layout complete with test points, ERC/DRC clean, reviewed by the instructor). On the ESP32-S31-Korvo-1 PoC board, SD storage is validated, WAV and MP3 files play audibly from the microSD card, and the board works as a player with buttons (play/pause, next/previous, limited volume) and an orderly shutdown on a simulated low battery. The display UI is pending, and the custom hardware (PCB Rev A) is **not yet validated**.
 
 ## Project goals
 
@@ -38,6 +38,8 @@ Board: 2 layers, 65 × 90.17 mm, designed for JLCPCB and hand soldering. Details
 - Discovery, filtering, and deterministic sorting of `.mp3` filenames under `MUSIC`.
 - Audio output through the Korvo BSP route (ES8389 codec, standard I²S).
 - Playback of 16-bit PCM WAV files and MP3 files (minimp3) from the microSD card.
+- A player that ties the `MUSIC` catalog to MP3 playback, driven by the board buttons (play/pause, next/previous, limited volume).
+- Orderly shutdown (mute, close file and codec) triggered by a simulated low battery.
 - UART diagnostic output and explicit error handling.
 
 **Evidence available**
@@ -46,7 +48,8 @@ Board: 2 layers, 65 × 90.17 mm, designed for JLCPCB and hand soldering. Details
 - On the physical ESP32-S31-Korvo-1: SD scenarios SD-01 to SD-07 validated (SD-08 deferred); audible test tone; WAV and MP3 files played from the microSD card, with timing logs.
 
 **Not yet demonstrated**
-- OLED, physical controls, and a player that ties the catalog to playback.
+- On-screen UI (OLED).
+- Real battery measurement and a real power cut (only a simulated battery and an orderly firmware stop on the Korvo).
 - Sample rates other than 8, 16, 44.1, and 48 kHz on the Korvo (a limitation of its codec setup).
 - USB MSC, Bluetooth, or a fabricated custom PCB (Rev A hardware not validated).
 
@@ -72,9 +75,9 @@ Final-device firmware is **not yet versioned**; it will be added only when the c
 
 ## Next milestones
 
-1. Build a player with the catalog and physical buttons on the Korvo (E5).
-2. Simulate a low-battery cutoff on the PoC board (E7).
-3. Then, port the firmware to PCB Rev A (microSD over SPI, PCM5102A).
+1. ~~Build a player with the catalog and physical buttons on the Korvo (E5)~~.
+2. ~~Simulate a low-battery cutoff on the PoC board (E7)~~.
+3. Next: port the firmware to PCB Rev A (microSD over SPI, PCM5102A).
 4. ~~Complete the target schematic and PCB layout~~ (Rev A frozen and reviewed); ~~power budget~~ ([estimate](hardware/docs/POWER_BUDGET_REV_A.md)); ~~generate fabrication outputs~~ (`hardware/outputs/`).
 5. Fabricate, assemble, and validate the custom PCB separately from the Korvo.
 6. Implement final-device firmware, then assess USB MSC and BM83 integration.
