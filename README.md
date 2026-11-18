@@ -46,6 +46,7 @@ Board: 2 layers, 65 × 90.17 mm, designed for JLCPCB and hand soldering. Details
 - Host tests covering the catalog, WAV parsing, the MP3 decoder wrapper, and supported sample rates.
 - ESP-IDF firmware-build results for the temporary Korvo target.
 - On the physical ESP32-S31-Korvo-1: SD scenarios SD-01 to SD-07 validated (SD-08 deferred); audible test tone; WAV and MP3 files played from the microSD card, with timing logs.
+- [Test videos on the ESP32-S31-Korvo-1](https://drive.google.com/drive/folders/1Tq-jJcRcQZm7ZzIBcm1W4Nzm8Wph00uq?usp=sharing) (3 videos recorded by the project lead).
 
 **Not yet demonstrated**
 - Real battery measurement and a real power cut (only a simulated battery and an orderly firmware stop on the Korvo).
