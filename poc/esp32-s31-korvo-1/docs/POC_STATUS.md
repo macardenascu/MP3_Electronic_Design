@@ -59,10 +59,10 @@ El contrato documentado es que cualquier error deja el catálogo en cero. Antes,
 ## Estado y límites
 
 - **Host:** pruebas ejecutadas y pasadas, incluida regresión de fallo `opendir()`.
-- **ESP-IDF:** compilado con ESP-IDF 6.1 en `poc/esp32-s31-korvo-1/build_s31` en modo STORAGE y TONE_BSP; el binario flasheado para la prueba audible de E2.2 es el de `build_s31`. `build_tonebsp` fue una verificación previa de compilación del mismo commit. Ver E2.
+- **ESP-IDF:** compilado con ESP-IDF 6.1 en `poc/esp32-s31-korvo-1/build_s31`, donde se compilaron y ejecutaron en placa los modos STORAGE, TONE_BSP, WAV y MP3; los binarios flasheados para las pruebas de E2.2, E3 y E4 son los de `build_s31`. `build_tonebsp` fue una verificación previa de compilación del commit de E2.2. Ver E2, E3 y E4.
 - **Hardware:** hito aceptado dentro del alcance SD-01 a SD-07 según log o confirmación del usuario. SD-08 aplazada por decisión del responsable; no es PASS físico. El pendiente LFN de SD-07 se cierra en E2.1: el aviso es un falso positivo del BSP 1.0.1 (ver sección E2).
 - No se ha demostrado extracción durante lectura, resistencia a fallas de medio ni funcionamiento del hardware final.
-- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). **E3** reproducción WAV PCM 16 bits desde microSD por ruta BSP: PASS (placa, ver E3). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria: la Korvo reproduce con I2S estándar. No hay decodificación MP3, OLED, botones, USB MSC o Bluetooth.
+- **E2.1** regresión de almacenamiento: PASS (placa). **E2.2** tono por ruta BSP: PASS (placa, observación auditiva del responsable). **E3** reproducción WAV PCM 16 bits desde microSD por ruta BSP: PASS (placa, ver E3). **E4** reproducción MP3 con minimp3 desde microSD por ruta BSP: PASS (placa, ver E4); en la Korvo solo 8000, 16000, 44100 y 48000 Hz (las demás se rechazan con `ESP_ERR_NOT_SUPPORTED`). La ruta TDM (`audio_korvo.c`, plan B) no está validada y no es necesaria: la Korvo reproduce con I2S estándar. No hay reproductor con catálogo, OLED, botones, USB MSC o Bluetooth.
 
 ## Ruta TDM ES8389 (plan B): compila, sin prueba en placa
 
@@ -120,6 +120,34 @@ Nota histórica: en una sesión anterior (Codex) no se pudo iniciar la compilaci
 - `ratio < 1` es esperado: `esp_codec_dev_write` retorna al encolar en DMA.
 - No probado: retirar la tarjeta durante la reproducción, archivos de horas, música comercial, WAV de 24 bits reales (solo rechazo en host), ruta SPI/PCM5102A del hardware final.
 
+## E4 — Reproducción MP3 con minimp3 (ruta BSP)
+
+- minimp3 commit `6238eb8` (CC0), sin modificar; SHA-256 verificados de forma independiente. Wrapper `decoder/mp3_decoder` (salta ID3v2, resincroniza, fija formato). Tarea `mp3_play` con pila de 32 KB.
+- Host (Linux, gcc 13.3, `-Werror`): "mp3_decoder tests passed"; "korvo_audio_caps tests passed". Decodificación de `TEST.MP3` y `MONO22K.MP3` frente a ffmpeg: diferencia máx 1 LSB, SNR 99,9 / 98,2 dB. minimp3 sin extensiones no recorta el retardo/relleno del codificador (~0,07 s más que ffmpeg): esperado.
+- Build ESP-IDF: 0 errores, binario `0x6a940` (58 % libre).
+
+### Resultados en placa (PASS)
+
+| Prueba | Log | Observación |
+|---|---|---|
+| `TEST.MP3` 44,1 kHz estéreo 128 kbps | `frames=1151 samples=1325952 ratio=0.999 decode_avg=2.68 ms decode_max=6.00 ms stack_free_min=15612` | Sonó bien |
+| `Idilio.mp3` 48 kHz 64 kbps (música real) | — | Audible >1 min sin defectos; reproducción completa no registrada |
+| `Formidable.mp3` 48 kHz 64 kbps (música real, completa) | `frames=7219 elapsed=173240 ms duration=173256 ms ratio=1.000 decode_avg=2.82 ms decode_max=6.81 ms skipped=0 stack_free_min=15612` | Completa |
+| `MONO22K.MP3` 22,05 kHz mono | — | Antes del arreglo: burbujeo audible; después: `ESP_ERR_NOT_SUPPORTED`, códec no se abre, sin reinicio |
+
+- Margen: `decode_max` (incluye lectura SD) 6,81 ms frente a 24–26 ms por frame; ~12 % CPU promedio. Pila: ~17 KB usados de 32 KB.
+
+### Diagnóstico 22050 Hz
+
+- `MONO22.WAV` (sin MP3) también burbujea -> no es el decodificador.
+- Causa en esp_codec_dev 1.5.11: sin MCLK, `es8389_config_sample()` usa `mclk = fs*16*4` y no hay fila (ratio 64) para 22050; `es8389_set_fs()` ignora el error y `open()` devuelve OK con divisores de reloj previos.
+- Frecuencias válidas en la Korvo: 8000, 16000, 44100, 48000. `korvo_audio_caps` rechaza las demás. Es una limitación de la Korvo; el PCM5102A de la PCB autodetecta fs.
+- Observación: el `ESP_LOGE` "Unable to configure sample rate" del driver no se vio en el log de 22050 Hz (no investigado).
+
+### No probado en placa
+
+Regresión de `TEST.MP3` tras el arreglo (cubierta por la prueba host de la lista); archivo no-MP3 en modo MP3; MP3 VBR, MPEG-2.5, archivos dañados, retirar la tarjeta durante la reproducción.
+
 ## Próxima acción
 
-E4 — decodificación MP3 con minimp3.
+E5 — reproductor con catálogo, `player_core` y botones.
