@@ -4,7 +4,7 @@
 
 A university engineering project exploring a dedicated, offline music player: local audio files, physical controls, and a focused interface without streaming services or smartphone dependency.
 
-> **Status:** firmware proof of concept (PoC) in progress, and custom PCB **Rev A design frozen** (schematics and layout complete with test points, ERC/DRC clean, reviewed by the instructor). On the ESP32-S31-Korvo-1 PoC board, SD storage is validated, WAV and MP3 files play audibly from the microSD card, and the board works as a player with buttons (play/pause, next/previous, limited volume) and an orderly shutdown on a simulated low battery. The display UI is pending, and the custom hardware (PCB Rev A) is **not yet validated**.
+> **Status:** firmware proof of concept (PoC) in progress, and custom PCB **Rev A design frozen** (schematics and layout complete with test points, ERC/DRC clean, reviewed by the instructor). On the ESP32-S31-Korvo-1 PoC board, SD storage is validated, WAV and MP3 files play audibly from the microSD card, and the board works as a player with buttons (play/pause, next/previous, limited volume) and an orderly shutdown on a simulated low battery. It also shows the on-screen UI as a virtual 128x64 OLED on the Korvo's LCD (designed for the PCB's SSD1306) and turns the screen off after inactivity. The custom hardware (PCB Rev A) is **not yet validated**.
 
 ## Project goals
 
@@ -48,7 +48,6 @@ Board: 2 layers, 65 × 90.17 mm, designed for JLCPCB and hand soldering. Details
 - On the physical ESP32-S31-Korvo-1: SD scenarios SD-01 to SD-07 validated (SD-08 deferred); audible test tone; WAV and MP3 files played from the microSD card, with timing logs.
 
 **Not yet demonstrated**
-- On-screen UI (OLED).
 - Real battery measurement and a real power cut (only a simulated battery and an orderly firmware stop on the Korvo).
 - Sample rates other than 8, 16, 44.1, and 48 kHz on the Korvo (a limitation of its codec setup).
 - USB MSC, Bluetooth, or a fabricated custom PCB (Rev A hardware not validated).
@@ -81,6 +80,7 @@ Final-device firmware is **not yet versioned**; it will be added only when the c
 4. ~~Complete the target schematic and PCB layout~~ (Rev A frozen and reviewed); ~~power budget~~ ([estimate](hardware/docs/POWER_BUDGET_REV_A.md)); ~~generate fabrication outputs~~ (`hardware/outputs/`).
 5. Fabricate, assemble, and validate the custom PCB separately from the Korvo.
 6. Implement final-device firmware, then assess USB MSC and BM83 integration.
+7. Optional future work: on-demand WiFi upload mode (copy MP3 files to the microSD card from a browser).
 
 ## License
 

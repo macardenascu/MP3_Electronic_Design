@@ -5,6 +5,7 @@ CONFIG_FATFS_MAX_LFN=255
 # PSRAM for the RGB LCD framebuffer (800x480 RGB565 = 768 KB, allocated by the BSP with fb_in_psram).
 # Source: esp-bsp examples for this board, examples/display*/sdkconfig.bsp.esp32_s31_korvo_1.
 # SPIRAM_FETCH_INSTRUCTIONS and SPIRAM_RODATA are omitted on purpose, so no code moves to PSRAM.
+# Speed is left at its default, 200 MHz (verified on the board). SPIRAM_SPEED_80M does not exist for the
+# ESP32-S31 in ESP-IDF 6.1; the real choices are 250/200/100/40 MHz.
 CONFIG_SPIRAM=y
 CONFIG_SPIRAM_MODE_OCT=y
-CONFIG_SPIRAM_SPEED_80M=y
