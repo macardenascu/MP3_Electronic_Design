@@ -70,15 +70,17 @@ Placa de 2 capas, 65 × 90.17 mm, FR-4 de 1.6 mm, cobre de 1 oz. La capa Bottom 
 
 ### Botones
 
-| Botón | Serigrafía | Señal | GPIO | Función por defecto |
-|---|---|---|---|---|
-| SW1 | `VOL+` | `BTN_UP_N` | IO15 | Subir volumen / arriba en el menú |
-| SW2 | `VOL-` | `BTN_DOWN_N` | IO16 | Bajar volumen / abajo en el menú |
-| SW3 | `PLAY/PAUSE` | `BTN_PLAY_N` | IO17 | Reproducir / pausar |
-| SW4 | `PREV` | `BTN_PREV_N` | IO18 | Canción anterior |
-| SW5 | `NEXT` | `BTN_NEXT_N` | IO21 | Canción siguiente |
-| SW6 | `BOOT` | `IO0` | IO0 | Mantener presionado al encender o al soltar RESET para entrar en modo programación |
-| SW7 | reset | `EN` | EN | Reinicia el ESP32 |
+> **Nota (Rev A):** los nombres de red de los botones no coinciden con la serigrafía. Eléctricamente es correcto (cada botón va a un GPIO distinto con su pull-up); la función se asigna en firmware según la posición física. Corregir los nombres de red en la Rev B.
+
+| Botón | Posición | Serigrafía | Señal (red) | GPIO | Función en firmware |
+|---|---|---|---|---|---|
+| SW1 | Centro | `PLAY/PAUSE` | `BTN_UP_N` | IO15 | Reproducir / pausar |
+| SW2 | Arriba | `VOL+` | `BTN_DOWN_N` | IO16 | Subir volumen / arriba en el menú |
+| SW3 | Abajo | `VOL-` | `BTN_PLAY_N` | IO17 | Bajar volumen / abajo en el menú |
+| SW4 | Derecha | `NEXT` | `BTN_PREV_N` | IO18 | Canción siguiente |
+| SW5 | Izquierda | `PREV` | `BTN_NEXT_N` | IO21 | Canción anterior |
+| SW6 | — | `BOOT` | `IO0` | IO0 | Mantener presionado al encender o al soltar RESET para entrar en modo programación |
+| SW7 | — | reset | `EN` | EN | Reinicia el ESP32 |
 
 Los cinco botones de usuario son activos en bajo: cada uno tiene un pull-up de 10 kΩ a `+3V3` (R9–R12, R15)
 y al presionarlo la señal va a 0 V. Su función la asigna el firmware, no el hardware.
