@@ -1,0 +1,9 @@
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ffffff','primaryBorderColor':'#000000','primaryTextColor':'#000000','lineColor':'#000000','edgeLabelBackground':'#ffffff','fontFamily':'Arial','fontSize':'15px'}}}%%
+flowchart LR
+  VBUS["VBUS 5 V<br/>USB-C"] --> CHG["TP4056<br/>I_carga ≈ 255 mA"]
+  CHG --> VBAT["VBAT 3.0–4.2 V<br/>Li-Po 1S"]
+  VBUS --> D1["D1 Schottky"] --> VSYS["VSYS<br/>≈4.7 V (USB) / VBAT"]
+  VBAT --> Q1["Q1 AP2301<br/>P-MOSFET"] --> VSYS
+  VBUS -. "compuerta" .-> Q1
+  VSYS --> LDO["AP2112K-3.3<br/>600 mA, EN = J5"] --> V33["+3V3<br/>ESP32, DAC, amp,<br/>microSD, OLED"]
+  VBAT --> DIV["Divisor 390k/390k<br/>→ BAT_ADC (IO1)"]

@@ -1,56 +1,56 @@
-# MP3_RevA — own Altium library
+# MP3_RevA — librería propia de Altium
 
-Components the course library (`shared_lib.IntLib`) does not have, or does not have in a usable form.
-Everything else on the board comes from the course library (see `hardware/README.md`).
-The reason for each own part is in [MANUAL_CONEXIONES_RevA.md](../../../docs/MANUAL_CONEXIONES_RevA.md), section 7.
+Componentes que la librería del curso (`shared_lib.IntLib`) no tiene, o no tiene en una forma utilizable.
+Todo lo demás en la placa viene de la librería del curso (ver `hardware/README.md`).
+La razón de cada pieza propia está en [MANUAL_CONEXIONES_RevA.md](../../../docs/MANUAL_CONEXIONES_RevA.md), sección 7.
 
-Files: `MP3_RevA.SchLib`, `MP3_RevA.PcbLib`, `MP3_RevA.LibPkg` (open it and run
-*Project → Compile Integrated Library* to get `MP3_RevA.IntLib`).
+Archivos: `MP3_RevA.SchLib`, `MP3_RevA.PcbLib`, `MP3_RevA.LibPkg` (ábralo y ejecute
+*Project → Compile Integrated Library* para obtener `MP3_RevA.IntLib`).
 
-**Status of every part: pinout and land pattern taken from the datasheet below and
-cross-checked symbol pin ↔ footprint pad (all match). Not built or tested.**
-Every IC/connector footprint has an embedded manufacturer STEP model.
+**Estado de cada pieza: pinout y huella tomados del datasheet indicado abajo, y verificado
+pin del símbolo ↔ pad de la huella (todos coinciden). No fabricado ni probado.**
+Cada huella de CI o conector tiene incrustado el modelo STEP del fabricante.
 
-## Parts used on the Rev A board
+## Piezas usadas en la placa Rev A
 
-| Symbol | Footprint | Source (revision) | Notes |
+| Símbolo | Huella | Fuente (revisión) | Notas |
 |---|---|---|---|
-| ESP32-S3-WROOM-1-N16R8 | ESP32-S3-WROOM-1 | Espressif datasheet v1.8, Table 3-1, Fig. 11-1 | EPAD = one pad (pin 41), checked against the datasheet land pattern; GND vias added on the board. IO35–IO37 used by the PSRAM. Antenna overhangs the board edge. |
-| AP2112K-3.3TRG1 | SOT-23-5 | Diodes DS39724 Rev. 2-2, SOT25 suggested pad layout | 600 mA LDO. Chosen over the course AMS1117 because of dropout on battery. |
-| PCM5102APWR | TSSOP-20_4.4x6.5mm_P0.65mm | TI SLAS859C, pin table and PW0020A board layout | I²S DAC, hardware control only. Support parts follow Figure 33. |
-| TPA6138A2PWR | TSSOP-14_4.4x5mm_P0.65mm | TI SLOS704B, pin table and PW0014A board layout | Ground-centred outputs, no coupling capacitors. UVP left unconnected (internal pull-up). |
-| MEM2075-00-140-01-A | MicroSD_GCT_MEM2075-00-140-01-A | GCT drawing rev A1 | Card-detect switch closes to the shell. NP1/NP2 are non-plated Multi-Layer holes (fixed 2026-11-11). |
-| SJ-3523-SMT | Jack_3.5mm_SameSky_SJ-3523-SMT | Same Sky datasheet 04/15/2025 (rev 1.07) | Pin 1 sleeve, 2 tip (L), 3 ring (R). Pin 4 not populated on this variant. NP1/NP2 are non-plated Multi-Layer holes (fixed 2026-11-11). |
-| TP | TP | Own design | Single round SMD pad on Top, mask opening. Not in the BOM. Used for all board test points. |
+| ESP32-S3-WROOM-1-N16R8 | ESP32-S3-WROOM-1 | Datasheet de Espressif v1.8, Tabla 3-1, Fig. 11-1 | EPAD = un pad (pin 41), revisado contra la huella del datasheet; vías de GND añadidas en la placa. IO35–IO37 los usa la PSRAM. La antena sobresale del borde de la placa. |
+| AP2112K-3.3TRG1 | SOT-23-5 | Diodes DS39724 Rev. 2-2, distribución de pads sugerida SOT25 | LDO de 600 mA. Elegido en lugar del AMS1117 del curso por su caída de voltaje con batería. |
+| PCM5102APWR | TSSOP-20_4.4x6.5mm_P0.65mm | TI SLAS859C, tabla de pines y layout PW0020A | DAC I²S, control solo por pines. Los componentes de soporte siguen la Figura 33. |
+| TPA6138A2PWR | TSSOP-14_4.4x5mm_P0.65mm | TI SLOS704B, tabla de pines y layout PW0014A | Salidas centradas en tierra, sin capacitores de acople. UVP sin conectar (pull-up interno). |
+| MEM2075-00-140-01-A | MicroSD_GCT_MEM2075-00-140-01-A | Plano de GCT rev A1 | El interruptor de detección de tarjeta cierra contra la carcasa. NP1/NP2 son agujeros Multi-Layer sin metalizar (corregido el 2026-11-11). |
+| SJ-3523-SMT | Jack_3.5mm_SameSky_SJ-3523-SMT | Datasheet de Same Sky 04/15/2025 (rev 1.07) | Pin 1 manga, 2 punta (L), 3 anillo (R). El pin 4 no existe en esta variante. NP1/NP2 son agujeros Multi-Layer sin metalizar (corregido el 2026-11-11). |
+| TP | TP | Diseño propio | Un pad SMD redondo en Top, con abertura de máscara. Fuera de la BOM. Se usa para todos los puntos de prueba de la placa. |
 
-### 0603 passives missing from the course library
+### Pasivos 0603 que faltan en la librería del curso
 
-Copies of the course templates (`Res_1k_0603_1/10W`, `Cap_1uF_0603_50V`, `Cap_1nF_0603_50V`) with the same
-`0603_res` / `0603_cap` footprint and 3D model. Manufacturer data is `TBD` until a part number is chosen.
+Copias de las plantillas del curso (`Res_1k_0603_1/10W`, `Cap_1uF_0603_50V`, `Cap_1nF_0603_50V`) con la misma
+huella `0603_res` / `0603_cap` y el mismo modelo 3D. Los datos de fabricante quedan como `TBD` hasta elegir una referencia.
 
-| Symbol | Value | Used for |
+| Símbolo | Valor | Uso |
 |---|---|---|
-| Res_470R_0603_1/10W | 470 Ω | DAC output RC filter |
-| Res_100k_0603_1/10W | 100 kΩ | Amplifier MUTE pull-down |
-| Cap_2.2uF_0603_10V | 2.2 µF | DAC charge pump (CAPP–CAPM, VNEG) |
-| Cap_2.2nF_0603_50V | 2.2 nF | DAC output RC filter |
+| Res_470R_0603_1/10W | 470 Ω | Filtro RC a la salida del DAC |
+| Res_100k_0603_1/10W | 100 kΩ | Pull-down del MUTE del amplificador |
+| Cap_2.2uF_0603_10V | 2.2 µF | Bomba de carga del DAC (CAPP–CAPM, VNEG) |
+| Cap_2.2nF_0603_50V | 2.2 nF | Filtro RC a la salida del DAC |
 
-## Parts kept in the library but not used (retired in schematic rev 2)
+## Piezas que siguen en la librería pero no se usan (retiradas en la rev 2 del esquemático)
 
-Replaced by course-library parts on 2026-11-10 to maximise use of `shared_lib`.
-Do not place them on the Rev A board.
+Reemplazadas por piezas de la librería del curso el 2026-11-10 para aprovechar al máximo `shared_lib`.
+No colocarlas en la placa Rev A.
 
-| Symbol | Replaced by (shared_lib) |
+| Símbolo | Reemplazado por (shared_lib) |
 |---|---|
 | USB4105-GF-A | `CON_USB_TYPEC_16P` (TYPE-C-3.1-16PIN) |
 | MCP73831T-2ACI_OT | `IC_BAT_CHG_4.2V_1A` (TP4056) |
 | AO3401A | `Q_PFET_30V_3A_SOT23` (AP2301) |
 | B2B-PH-K-S | `Con_2x1_TH_JST_2MM` (S2B-PH-K-S) |
 
-## History
+## Historial
 
-- 2026-11-09: own library created; QFN parts removed in favour of leaded packages
-  (PCM5102A + TPA6138A2 instead of ES8388; MCP73831 + AO3401A + AP2112K instead of MCP73871 + TPS63802).
-- 2026-11-10: four missing 0603 passives added; USB-C, charger, PFET and battery connector moved to `shared_lib`.
-- 2026-11-11: microSD and jack anchoring holes changed from drilled SMT pads to non-plated Multi-Layer pads.
-- 2026-11-12: `TP` symbol and footprint added for the board test points.
+- 2026-11-09: se crea la librería propia; se quitan las piezas QFN en favor de encapsulados con patas
+  (PCM5102A + TPA6138A2 en lugar del ES8388; MCP73831 + AO3401A + AP2112K en lugar de MCP73871 + TPS63802).
+- 2026-11-10: se agregan los cuatro pasivos 0603 que faltaban; USB-C, cargador, PFET y conector de batería pasan a `shared_lib`.
+- 2026-11-11: los agujeros de anclaje de la microSD y del jack pasan de pads SMT taladrados a pads Multi-Layer sin metalizar.
+- 2026-11-12: se agregan el símbolo y la huella `TP` para los puntos de prueba de la placa.

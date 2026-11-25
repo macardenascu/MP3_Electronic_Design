@@ -1,67 +1,69 @@
-# Rev A academic PCB | Work plan
+# PCB académica Rev A | Plan de trabajo
 
-Status (2026-11-14): **Rev A design frozen (ERC 0 errors, DRC 0 violations) and reviewed by the instructor
-(positive). Next: fabrication outputs.**
+Estado (2026-11-15): **diseño de la Rev A congelado (ERC 0 errores, DRC 0 violaciones), revisado por el profesor
+(positivo) y entregado con la etiqueta `rev-a`.**
 
-## G0 | Repo and Altium setup
-- [x] Project in `hardware/altium/MP3_Player/MP3_Player.PrjPcb` with 7 schematic sheets and the board
-- [x] Own library `MP3_RevA` linked to the project
-- [x] Instructor library used locally and excluded from Git pending redistribution permission
-- [x] Native project files committed and merged to `main` (PR #1 schematics, PR #2 PCB, PR #3–#5 fixes, docs and logo)
+## G0 | Configuración del repositorio y de Altium
+- [x] Proyecto en `hardware/altium/MP3_Player/MP3_Player.PrjPcb` con 7 hojas de esquemático y la placa
+- [x] Librería propia `MP3_RevA` enlazada al proyecto
+- [x] Librería del profesor usada en local y excluida de Git hasta tener permiso de redistribución
+- [x] Archivos nativos del proyecto en `main` (PR #1 esquemáticos, PR #2 PCB, PR #3–#5 correcciones, documentación y logo)
 
-## G1 | Library and component evidence
-- [x] Own symbols and footprints checked against datasheets, pin ↔ pad (see `altium/libraries/project/README.md`)
-- [x] Course-library parts preferred; own parts justified (`MANUAL_CONEXIONES_RevA.md`, section 7)
-- [x] Footprint fixes found by DRC: microSD and jack anchoring holes (non-plated), USB-C clearance exception
-- [x] BOM exported in the grouping the instructor asks for (the 4 own 0603 passives share one line with manufacturer `TBD`; test points list KOA RCWCTE)
-- [ ] Footprints confirmed against physical parts before soldering
+## G1 | Librería y evidencia de componentes
+- [x] Símbolos y huellas propios revisados contra los datasheets, pin ↔ pad (ver `altium/libraries/project/README.md`)
+- [x] Preferencia por piezas de la librería del curso; piezas propias justificadas (`MANUAL_CONEXIONES_RevA.md`, sección 7)
+- [x] Correcciones de huellas encontradas por el DRC: agujeros de anclaje de la microSD y del jack (sin metalizar), excepción de separación en el USB-C
+- [x] BOM exportada con la agrupación que pide el profesor (los 4 pasivos 0603 propios comparten una línea con fabricante `TBD`; los puntos de prueba figuran como KOA RCWCTE)
+- [ ] Huellas confirmadas contra las piezas físicas antes de soldar
 
-## G2 | System architecture and floorplan
-- [x] Interfaces and GPIO table (USB, I²S, SPI, I²C, buttons, ADC) — `MANUAL_CONEXIONES_RevA.md`, section 3
-- [x] Two layers only (Top and Bottom), Bottom mainly GND plane
-- [x] Board outline 65 × 90.17 mm (from the Gerber profile) (course limit 100 × 100 mm)
-- [x] Antenna placed outside the board edge, as indicated by the instructor
+## G2 | Arquitectura del sistema y distribución
+- [x] Interfaces y tabla de GPIO (USB, I²S, SPI, I²C, botones, ADC): `MANUAL_CONEXIONES_RevA.md`, sección 3
+- [x] Solo dos capas (Top y Bottom), Bottom principalmente plano de GND
+- [x] Contorno de 65 × 90.17 mm (según el perfil del Gerber); límite del curso 100 × 100 mm
+- [x] Antena fuera del borde de la placa, como indicó el profesor
 
-## G3 | Schematic by blocks
-- [x] Power: TP4056 charger, AN1149 load sharing (AP2301 + Schottky), AP2112K LDO, ADC dividers
-- [x] MCU core: decoupling, EN reset RC, BOOT/RESET buttons, strapping and PSRAM pins left free, UART header
-- [x] USB-C: CC pull-downs, USBLC6 ESD protection
-- [x] Storage: SPI microSD with pull-ups and card detect
-- [x] Audio: PCM5102A (TI Figure 33 values) → RC filter → TPA6138A2 (G = −1) → 3.5 mm jack
-- [x] User interface: five buttons with pull-ups, OLED header with I²C pull-ups
-- [x] Top level: hierarchical ports and sheet entries
-- [x] ERC: 0 errors (remaining "no driving source" warnings suppressed with No ERC on reviewed nets)
-- [x] Power budget and battery autonomy estimate (`POWER_BUDGET_REV_A.md`; measured validation pending)
+## G3 | Esquemático por bloques
+- [x] Energía: cargador TP4056, selección de fuente AN1149 (AP2301 + Schottky), LDO AP2112K, divisores para el ADC
+- [x] Núcleo del MCU: desacople, RC de reset en EN, botones BOOT/RESET, pines de arranque y de PSRAM libres, header UART
+- [x] USB-C: pull-downs CC, protección ESD USBLC6
+- [x] Almacenamiento: microSD por SPI con pull-ups y detección de tarjeta
+- [x] Audio: PCM5102A (valores de la Figura 33 de TI) → filtro RC → TPA6138A2 (G = −1) → jack de 3.5 mm
+- [x] Interfaz de usuario: cinco botones con pull-up, header de la OLED con pull-ups I²C
+- [x] Nivel superior: puertos jerárquicos y entradas de hoja
+- [x] ERC: 0 errores (las advertencias "no driving source" restantes se suprimieron con No ERC en redes revisadas)
+- [x] Presupuesto de potencia y autonomía (`POWER_BUDGET_REV_A.md`; validación con medidas pendiente)
 
-## G4 | Board design
-- [x] JLCPCB 2-layer rules with margin for hand soldering (see `hardware/README.md`)
-- [x] Placement reviewed before routing; edge connectors, OLED area and button cross fixed first
-- [x] Power routed first (VBUS, VBAT, VSYS, +3V3), then USB pair, local nets, buses and UI
-- [x] GND polygon pours on Top and Bottom, stitching vias, no isolated GND islands
-- [x] Test points on power, boot and audio nets (placed from the schematics, not in the BOM)
-- [x] Silkscreen cleaned up (1.0 mm text, 0.15 mm stroke); button and connector labels (J1–J7); dinosaur logo on Bottom Overlay
-- [x] DRC: 0 violations, 0 warnings; 3D visual review
-- [x] Instructor review (2026-11-14, positive)
+## G4 | Diseño de la placa
+- [x] Reglas de JLCPCB para 2 capas con margen para soldar a mano (ver `hardware/README.md`)
+- [x] Ubicación revisada antes de rutear; primero conectores de borde, zona de la OLED y cruz de botones
+- [x] Primero la alimentación (VBUS, VBAT, VSYS, +3V3), luego el par USB, redes locales, buses e interfaz
+- [x] Rellenos de GND en Top y Bottom, vías de unión, sin islas de GND aisladas
+- [x] Puntos de prueba en redes de alimentación, arranque y audio (colocados desde los esquemáticos, fuera de la BOM)
+- [x] Serigrafía depurada (texto de 1.0 mm, trazo de 0.15 mm); etiquetas de botones y conectores (J1–J7); logo del dinosaurio en el Bottom Overlay
+- [x] DRC: 0 violaciones, 0 advertencias; revisión visual en 3D
+- [x] Revisión del profesor (2026-11-14, positiva)
 
-## G5 | Academic deliverables
-- [x] Native Altium project and own library
-- [x] PDFs: schematics (`SHC/SCH.pdf`), Draftsman fabrication drawing, 3D PDF and STEP model
-- [x] BOM (`BOM/BOM.xlsx`); design decisions in `MANUAL_CONEXIONES_RevA.md` and the READMEs
-- [x] DRC report exported (0 violations, 0 warnings; inside `GERBERS/GERBERS.zip`)
-- [x] ERC: 0 errors in Altium; exported report not required by the course
-- [x] Fabrication outputs: Gerbers and NC drill for JLCPCB, under `hardware/outputs/MP3_entregables/` (2026-11-14)
-- [x] Revision-tagged Git checkpoint (`rev-a`, after the USB fix of 2026-11-15)
-- [x] Delivered to the instructor (Classroom, 2026-11-15)
+## G5 | Entregables académicos
+- [x] Proyecto nativo de Altium y librería propia
+- [x] PDFs: esquemáticos (`SHC/SCH.pdf`), plano de fabricación en Draftsman, PDF 3D y modelo STEP
+- [x] BOM (`BOM/BOM.xlsx`); decisiones de diseño en `MANUAL_CONEXIONES_RevA.md` y en los README
+- [x] Reporte DRC exportado (0 violaciones, 0 advertencias; dentro de `GERBERS/GERBERS.zip`)
+- [x] ERC: 0 errores en Altium; el curso no exige exportar el reporte
+- [x] Salidas de fabricación: Gerbers y taladros NC para JLCPCB, en `hardware/outputs/MP3_entregables/` (2026-11-14)
+- [x] Punto de control en Git con etiqueta de revisión (`rev-a`, tras la corrección del USB del 2026-11-15)
+- [x] Entregado al profesor (Classroom, 2026-11-15)
+- [x] Nota de aplicación y pitch del producto (`docs/`, 2026-11-25)
 
-## Current known risks
-- Battery cable polarity is not standard across JST-PH batteries: check before connecting.
-- OLED module pin order varies by vendor: buy a GND–VCC–SCL–SDA module and check its silkscreen.
-- AP2112K dropout leaves the last part of the battery charge unused.
-- TP4056 dissipates up to ≈ 0.4 W while charging; copper around it acts as heatsink.
-- USB-C (0.5 mm pitch) and TSSOP parts are the hardest joints to hand-solder.
-- The antenna overhangs the 65 × 90.17 mm outline; check the overall size if an enclosure is made.
-- DRC and ERC passing is not functional validation: nothing has been built or tested yet.
+## Riesgos conocidos
+- La polaridad del cable no es estándar entre baterías JST-PH: verificarla antes de conectar.
+- El orden de pines de los módulos OLED cambia según el fabricante: comprar uno GND–VCC–SCL–SDA y revisar su serigrafía.
+- La caída del AP2112K deja sin usar la última parte de la carga de la batería.
+- El TP4056 disipa hasta ≈ 0.4 W mientras carga; el cobre a su alrededor actúa como disipador.
+- El USB-C (paso de 0.5 mm) y las piezas TSSOP son las uniones más difíciles de soldar a mano.
+- La antena sobresale del contorno de 65 × 90.17 mm; revisar el tamaño total si se hace una carcasa.
+- En la Rev A los nombres de red de los botones no coinciden con la serigrafía; la función de cada GPIO se toma del manual de conexiones.
+- Pasar ERC y DRC no es validación funcional: todavía no se ha fabricado ni probado nada.
 
-## Review discipline
-Need → numerical/electrical requirement → alternatives → verified selection → Altium implementation → ERC/DRC checks → status (approved, provisional or pending).
-Do not edit the separate PoC firmware during this workflow.
+## Disciplina de revisión
+Necesidad → requisito numérico/eléctrico → alternativas → selección verificada → implementación en Altium → revisiones ERC/DRC → estado (aprobado, provisional o pendiente).
+No editar el firmware de la PoC durante este flujo de trabajo.

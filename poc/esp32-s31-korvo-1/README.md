@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Validar en firmware el montaje de microSD proporcionado por el BSP y el inventario determinista de nombres `.mp3` dentro de `MUSIC`. La primera etapa no prueba reproducción de audio.
+Validar el firmware del reproductor antes de tener la PCB: montaje de la microSD, catálogo ordenado de los `.mp3` de `MUSIC`, reproducción de WAV y MP3 (minimp3), controles con botones, volumen con tope, interfaz de 128×64 y apagado ordenado por batería baja simulada. El desarrollo se hizo por etapas (E0–E8); el detalle de cada una está en `docs/POC_STATUS.md`.
 
 La Korvo es una plataforma temporal: usa ESP32-S31, códec ES8389 y SDMMC. El hardware objetivo propuesto usa ESP32-S3-WROOM-1-N16R8, DAC PCM5102A + amplificador de audífonos TPA6138A2 por I²S y microSD por SPI. Por tanto, esta PoC no valida compatibilidad eléctrica, audio ni almacenamiento del producto final.
 
@@ -17,11 +17,13 @@ El script `tools/activate_idf.ps1` activa la instalación local de ESP-IDF en Wi
 
 ## Archivos
 
-- `main/music_catalog.c/.h`: lógica portable del catálogo, con capacidad fija y ordenamiento determinista.
-- `main/storage_korvo.c/.h`: adaptación del montaje SD al BSP.
+- `main/core/`: núcleo portable en C11 (máquina de estados del reproductor, volumen, secuencia anti-pop, política de batería, lector WAV, interfaz de 128×64). No toca el hardware.
+- `main/decoder/` y `main/third_party/minimp3/`: envoltorio del decodificador MP3 y minimp3 (dominio público).
+- `main/music_catalog.c/.h`: catálogo portable, con capacidad fija y ordenamiento determinista.
+- `main/storage_korvo.c`, `audio_*.c`, `korvo_*.c`, `player_app.c`: capa de placa de la Korvo (microSD, audio, botones, pantalla) y la aplicación del reproductor.
 - `main/app_main.c`: arranque y diagnóstico por consola.
-- `tests/host/`: pruebas host del catálogo y shim de errores ESP-IDF.
-- `sdkconfig.defaults`, `dependencies.lock`, `CMakeLists.txt`: configuración y reproducibilidad ESP-IDF.
+- `tests/host/`: pruebas en el computador; ver `tests/host/README.md`.
+- `sdkconfig.defaults`, `dependencies.lock`, `CMakeLists.txt`: configuración y reproducibilidad de ESP-IDF.
 - `docs/POC_STATUS.md`: resultados, límites y evidencia detallada.
 
 ## Preparación y pruebas host en Windows (PowerShell)
@@ -56,4 +58,4 @@ El nombre anterior `build_new` permanece válido como referencia histórica, per
 
 ## Resultado esperado y límites
 
-Al ejecutar el firmware en una placa se esperan mensajes de diagnóstico del montaje SD y del catálogo. La compilación por sí sola no demuestra ese comportamiento físico. En esta primera etapa no se decodifica ni reproduce MP3, PCM o WAV; tampoco están implementados interfaz OLED, botones, USB MSC o Bluetooth. Consulte [POC_STATUS.md](docs/POC_STATUS.md) para separar resultados host, compilación y validación física.
+Al ejecutar el firmware en la placa se esperan los mensajes de diagnóstico del montaje SD y del catálogo, y la reproducción de la primera canción de `MUSIC`. La compilación por sí sola no demuestra ese comportamiento físico. Esta PoC valida el firmware, no la electrónica de la PCB Rev A; USB MSC y Bluetooth no están implementados. Consulte [POC_STATUS.md](docs/POC_STATUS.md) para separar resultados en el computador, compilación y validación física.
