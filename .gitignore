@@ -50,7 +50,7 @@ logs/
 Thumbs.db
 Desktop.ini
 
-# Altium: local history, previews and generated outputs
+# Altium: historial local, vistas previas y salidas generadas
 **/History/
 **/__Previews/
 *.PrjPcbStructure
@@ -58,5 +58,8 @@ Desktop.ini
 *.PcbDocPreview
 Project Outputs for */
 
-# Course library (professor's, not to be published)
+# Librería del curso (del profesor, no se publica)
 hardware/altium/libraries/external/
+
+# HTML intermedio de la nota de aplicación (lo genera build.py)
+docs/nota-aplicacion/nota.html

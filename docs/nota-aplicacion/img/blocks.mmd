@@ -1,0 +1,16 @@
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ffffff','primaryBorderColor':'#000000','primaryTextColor':'#000000','lineColor':'#000000','edgeLabelBackground':'#ffffff','fontFamily':'Arial','fontSize':'15px'}}}%%
+flowchart TB
+  USB["USB-C J2<br/>5 V + USB 2.0"] --> ESD["USBLC6-2SC6<br/>ESD"]
+  ESD -- "D+/D− (IO19/IO20)" --> MCU
+  USB -- VBUS --> PWR["Gestión de energía<br/>TP4056 + load sharing<br/>AP2112K-3.3"]
+  BAT["Li-Po 1S<br/>J1"] <--> PWR
+  PWR -- "+3V3" --> MCU
+  PWR -- "VBAT/2, VBUS/2<br/>(IO1, IO2)" --> MCU
+  MCU["ESP32-S3-WROOM-1<br/>N16R8"] -- "I²S (IO4–IO6)<br/>+ XSMT (IO38)" --> DAC["DAC<br/>PCM5102A"]
+  DAC --> RC["Filtro RC<br/>470 Ω / 2.2 nF"] --> AMP["Amp. audífonos<br/>TPA6138A2 (G = −1)"]
+  MCU -- "MUTE_N (IO7)" --> AMP
+  AMP --> JACK["Jack 3.5 mm J4"]
+  MCU -- "SPI (IO10–IO13)<br/>CD (IO14)" --> SD["microSD J3"]
+  MCU -- "I²C (IO8/IO9)" --> OLED["OLED SSD1306<br/>128×64 (J6)"]
+  BTN["5 botones<br/>activos en bajo"] -- "IO15–IO18, IO21" --> MCU
+  MCU -- "UART (IO43/IO44)" --> DBG["J7 depuración"]

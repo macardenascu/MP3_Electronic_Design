@@ -1,8 +1,8 @@
-# Host tests
+# Pruebas en el computador (host)
 
-This compiles the exact portable `main/music_catalog.c` implementation with a tiny ESP error-code shim. It covers missing and non-directory MUSIC paths, empty MUSIC directories, mixed-case extensions, ignored files/directories, deterministic sorting and a long supported filename. The scanner probes each candidate with open/close and reports failures rather than listing inaccessible files.
+Estas pruebas compilan exactamente la implementación portable de `main/music_catalog.c` con un pequeño reemplazo de los códigos de error de ESP-IDF. Cubren rutas `MUSIC` inexistentes o que no son directorio, directorios `MUSIC` vacíos, extensiones con mayúsculas mezcladas, archivos y directorios ignorados, ordenamiento determinista y un nombre largo admitido. El catálogo prueba cada candidato con open/close y reporta los fallos en lugar de listar archivos inaccesibles.
 
-On a POSIX host with a C11 compiler and CMake:
+En un computador POSIX con un compilador C11 y CMake:
 
 ```sh
 cmake -S tests/host -B build-host
@@ -10,7 +10,7 @@ cmake --build build-host
 ./build-host/music_catalog_test
 ```
 
-The test was run on Windows through MSYS2 GCC with:
+La prueba se ejecutó en Windows con GCC de MSYS2 así:
 
 ```sh
 mkdir -p build-host/tmp
@@ -22,9 +22,9 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
 ./build-host/music_catalog_test
 ```
 
-## Player core (main/core)
+## Núcleo del reproductor (main/core)
 
-`main/core/` holds the portable C11 player logic: `volume`, `mute_sequencer`, `power_policy` and `player_core`. It returns ordered commands and never touches hardware or allocates memory. Each module has its own test:
+`main/core/` contiene la lógica portable del reproductor en C11: `volume`, `mute_sequencer`, `power_policy` y `player_core`. Devuelve órdenes en secuencia y nunca toca el hardware ni reserva memoria. Cada módulo tiene su propia prueba:
 
 ```sh
 for t in volume mute_sequencer power_policy; do
@@ -45,9 +45,9 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
   -o build-host/player_core_test && ./build-host/player_core_test
 ```
 
-## Korvo audio capabilities (main/korvo_audio_caps.c)
+## Capacidades de audio de la Korvo (main/korvo_audio_caps.c)
 
-`korvo_audio_caps_test` checks the sample rates the Korvo BSP speaker path can clock (ES8389 without MCLK, 16 bits: 8000, 16000, 44100, 48000 Hz) and that others such as 22050 and 11025 Hz are rejected:
+`korvo_audio_caps_test` comprueba las frecuencias de muestreo que puede generar la ruta de altavoz del BSP de la Korvo (ES8389 sin MCLK, 16 bits: 8000, 16000, 44100 y 48000 Hz) y que otras, como 22050 y 11025 Hz, se rechazan:
 
 ```sh
 gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
@@ -55,9 +55,9 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
   -o build-host/korvo_audio_caps_test && ./build-host/korvo_audio_caps_test
 ```
 
-## Player pieces (E5/E7)
+## Piezas del reproductor (E5/E7)
 
-`korvo_volume_test` checks the dB-to-percent mapping (-60 dB -> 0 %, -12 dB -> 60 %, linear, rounded, saturating). `battery_sim_test` chains the simulated battery (3700 mV, -20 mV/tick) with `power_policy` (cutoff 3500 mV, hysteresis 100 mV, 5 readings), prints the tick where LOW_BATTERY fires and checks it fires once:
+`korvo_volume_test` comprueba la conversión de dB a porcentaje (−60 dB → 0 %, −12 dB → 60 %, lineal, redondeada y con saturación). `battery_sim_test` encadena la batería simulada (3700 mV, −20 mV por tick) con `power_policy` (corte en 3500 mV, histéresis de 100 mV, 5 lecturas), imprime el tick en que se dispara LOW_BATTERY y comprueba que se dispara una sola vez:
 
 ```sh
 gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main \
@@ -68,9 +68,9 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
   -o build-host/battery_sim_test && ./build-host/battery_sim_test
 ```
 
-## UI (E6/E8)
+## Interfaz (E6/E8)
 
-`ui_model_test` covers the 128x64 SSD1306-layout framebuffer and clipping, name scrolling (offset at 0, 1000, 1300 and 1600 ms, restart of each lap), centered short names without extension, `mm:ss`, the volume bar at min/middle/max, the 2 s message, screen off after 10 s, the first button press discarded while off, a message waking the screen, and that every player message fits in 16 characters. `ui_preview` writes `ui_<case>.pbm` (P4, 128x64) for: short track playing, long name at t=0 and t=2000 ms, paused, max volume, "No soportado", "Bateria baja" and empty catalog:
+`ui_model_test` cubre el framebuffer de 128x64 con el formato del SSD1306 y el recorte, el desplazamiento del nombre (posición a 0, 1000, 1300 y 1600 ms, y reinicio de cada vuelta), nombres cortos centrados y sin extensión, el formato `mm:ss`, la barra de volumen en mínimo, medio y máximo, el mensaje de 2 s, el apagado de la pantalla a los 10 s, que la primera pulsación con la pantalla apagada se descarta, que un mensaje enciende la pantalla y que todos los mensajes del reproductor caben en 16 caracteres. `ui_preview` escribe `ui_<caso>.pbm` (P4, 128x64) para: canción corta reproduciendo, nombre largo en t=0 y t=2000 ms, pausa, volumen máximo, "No soportado", "Bateria baja" y catálogo vacío:
 
 ```sh
 gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
@@ -81,13 +81,13 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/core \
 (cd build-host && ./ui_preview)
 ```
 
-The 8x8 font is public domain; see `main/core/FONT_LICENSE.md`.
+La fuente de 8x8 es de dominio público; ver `main/core/FONT_LICENSE.md`.
 
-## MP3 decoder (main/decoder)
+## Decodificador MP3 (main/decoder)
 
-`mp3_decoder_test` covers the ID3v2 syncsafe size (including the footer flag), an empty file, a tag larger than the input buffer, a truncated tag, random data (`ESP_ERR_NOT_SUPPORTED`) and a failing read callback (`ESP_FAIL`). It does not decode real audio.
+`mp3_decoder_test` cubre el tamaño *syncsafe* de ID3v2 (incluido el indicador de pie), un archivo vacío, una etiqueta más grande que el búfer de entrada, una etiqueta truncada, datos aleatorios (`ESP_ERR_NOT_SUPPORTED`) y una función de lectura que falla (`ESP_FAIL`). No decodifica audio real.
 
-`mp3_to_wav` is a host tool that decodes a real MP3 with the same wrapper and writes a 16-bit WAV with the same channels and sample rate, printing `frames`, `sample_rate`, `channels`, `samples_per_ch` and `skipped_bytes`:
+`mp3_to_wav` es una herramienta para el computador que decodifica un MP3 real con el mismo envoltorio y escribe un WAV de 16 bits con los mismos canales y frecuencia de muestreo. Imprime `frames`, `sample_rate`, `channels`, `samples_per_ch` y `skipped_bytes`:
 
 ```sh
 gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/decoder -I main/third_party/minimp3 \
@@ -95,4 +95,4 @@ gcc -std=c11 -Wall -Wextra -Werror -I tests/host/include -I main/decoder -I main
 ./build-host/mp3_to_wav input.mp3 output.wav
 ```
 
-Test fixtures are created under `build-host/` so they remain inside the project. Permission-denied iteration errors are difficult to reproduce reliably when tests run as an administrator/root. The scanner propagates `opendir`, `stat`, `readdir`, and `closedir` failures.
+Los archivos de prueba se crean dentro de `build-host/`, así que quedan dentro del proyecto. Los errores de permiso denegado al recorrer directorios son difíciles de reproducir de forma fiable cuando las pruebas corren como administrador/root. El catálogo propaga los fallos de `opendir`, `stat`, `readdir` y `closedir`.

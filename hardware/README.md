@@ -1,114 +1,118 @@
-# Portable MP3 Player | Hardware Rev A
+# Reproductor MP3 portátil | Hardware Rev A
 
-Custom PCB designed in **Altium Designer 26.11.1** for the university Electronic Design course.
-Firmware proof-of-concept work stays under `poc/`.
+PCB propia diseñada en **Altium Designer 26.11.1** para el curso de Diseño Electrónico.
+El firmware de la prueba de concepto está en `poc/`.
 
-**Status (2026-11-15): Rev A delivered** (tag `rev-a`). Reviewed by the instructor (positive), USB data
-lines fixed, fabrication outputs in `outputs/MP3_entregables/`. ERC: 0 errors. DRC: 0 violations, 0 warnings.
-How everything is wired: [MANUAL_CONEXIONES_RevA.md](docs/MANUAL_CONEXIONES_RevA.md).
+**Estado (2026-11-15): Rev A entregada** (etiqueta `rev-a`). Revisada por el profesor (concepto positivo), líneas de
+datos USB corregidas y salidas de fabricación en `outputs/MP3_entregables/`. ERC: 0 errores. DRC: 0 violaciones, 0 advertencias.
+Cómo está conectado todo: [MANUAL_CONEXIONES_RevA.md](docs/MANUAL_CONEXIONES_RevA.md).
+El diseño completo está explicado en la [nota de aplicación](../docs/nota-aplicacion/Nota_de_Aplicacion_Reproductor_MP3.pdf).
 
-## Course constraints
+## Restricciones del curso
 
-| Constraint | Rev A |
+| Restricción | Rev A |
 |---|---|
-| Copper layers | 2 (Top and Bottom), Bottom used mainly as GND plane |
-| Board size | ≤ 100 × 100 mm → final outline **65 × 90.17 mm** |
-| Fabrication | JLCPCB |
-| Assembly | Hand soldered by the students |
-| Libraries | Instructor's `shared_lib` first; own parts only when justified |
+| Capas de cobre | 2 (Top y Bottom); Bottom se usa sobre todo como plano de GND |
+| Tamaño de la placa | ≤ 100 × 100 mm → contorno final **65 × 90.17 mm** |
+| Fabricación | JLCPCB |
+| Ensamble | Soldado a mano por los estudiantes |
+| Librerías | Primero la `shared_lib` del profesor; piezas propias solo cuando se justifica |
 
-## Architecture
+## Arquitectura
 
-| Block | Sheet | Main parts |
+| Bloque | Hoja | Componentes principales |
 |---|---|---|
-| Block diagram | `00_System_Top` | Hierarchical sheet entries between all blocks |
-| Power | `10_Power_Management` | TP4056 charger (R_PROG 4.7 kΩ ≈ 255 mA), AP2301 P-MOSFET + Schottky load sharing (Microchip AN1149), AP2112K-3.3 LDO, 1S Li-Po on JST-PH, VBAT/2 and VBUS dividers to the ADC |
-| MCU | `20_MCU_Core` | ESP32-S3-WROOM-1-N16R8, EN reset RC, BOOT and RESET buttons, UART header |
-| USB | `30_USB_Interface` | USB-C 2.0 (5 V + data), 4.7 kΩ CC pull-downs, USBLC6-2SC6 ESD protection |
-| Storage | `40_Storage` | microSD socket (GCT MEM2075) in SPI mode, 10 kΩ pull-ups, card detect |
-| Audio | `50_Audio_Codec` | PCM5102A I²S DAC → 470 Ω / 2.2 nF filter → TPA6138A2 headphone amplifier (G = −1) → 3.5 mm jack |
-| User interface | `60_User_Interface` | 5 buttons (active low, 10 kΩ pull-ups), SSD1306 128×64 I²C OLED module on a 4-pin header (GND, VCC, SCL, SDA) |
+| Diagrama de bloques | `00_System_Top` | Entradas de hoja jerárquicas entre todos los bloques |
+| Energía | `10_Power_Management` | Cargador TP4056 (R_PROG 4.7 kΩ ≈ 255 mA), selección de fuente con P-MOSFET AP2301 + Schottky (Microchip AN1149), LDO AP2112K-3.3, Li-Po 1S en JST-PH, divisores VBAT/2 y VBUS hacia el ADC |
+| MCU | `20_MCU_Core` | ESP32-S3-WROOM-1-N16R8, RC de reset en EN, botones BOOT y RESET, header UART |
+| USB | `30_USB_Interface` | USB-C 2.0 (5 V + datos), pull-downs CC de 4.7 kΩ, protección ESD USBLC6-2SC6 |
+| Almacenamiento | `40_Storage` | Socket microSD (GCT MEM2075) en modo SPI, pull-ups de 10 kΩ, detección de tarjeta |
+| Audio | `50_Audio_Codec` | DAC I²S PCM5102A → filtro 470 Ω / 2.2 nF → amplificador de audífonos TPA6138A2 (G = −1) → jack de 3.5 mm |
+| Interfaz de usuario | `60_User_Interface` | 5 botones (activos en bajo, pull-ups de 10 kΩ), módulo OLED SSD1306 128×64 I²C en un header de 4 pines (GND, VCC, SCL, SDA) |
 
-Power rails: `VBUS` (5 V USB), `VBAT` (3.0–4.2 V), `VSYS` (USB or battery), `+3V3` (logic).
+Rieles de alimentación: `VBUS` (5 V del USB), `VBAT` (3.0–4.2 V), `VSYS` (USB o batería), `+3V3` (lógica).
 
-## Component sources
+## Origen de los componentes
 
-- **Instructor library (`shared_lib`)**: USB-C, TP4056, AP2301, JST battery connector, Schottky diode,
-  USBLC6, LED, push buttons, headers and all generic 0603 passives.
-- **Own library (`MP3_RevA`)**: ESP32-S3 module, AP2112K, PCM5102A, TPA6138A2, microSD socket,
-  audio jack, four 0603 values missing from the course library (470 Ω, 100 kΩ, 2.2 µF, 2.2 nF)
-  and a single-pad test point (`TP`, not in the BOM).
-  The reason for each own part is in the [connection manual](docs/MANUAL_CONEXIONES_RevA.md), section 7.
+- **Librería del profesor (`shared_lib`)**: USB-C, TP4056, AP2301, conector de batería JST, diodo Schottky,
+  USBLC6, LED, pulsadores, headers y todos los pasivos 0603 genéricos.
+- **Librería propia (`MP3_RevA`)**: módulo ESP32-S3, AP2112K, PCM5102A, TPA6138A2, socket microSD,
+  jack de audio, cuatro valores 0603 que faltan en la librería del curso (470 Ω, 100 kΩ, 2.2 µF, 2.2 nF)
+  y un punto de prueba de un solo pad (`TP`, fuera de la BOM).
+  La razón de cada pieza propia está en el [manual de conexiones](docs/MANUAL_CONEXIONES_RevA.md), sección 7.
 
-`shared_lib` is not published in this repository (license not confirmed). The schematic and PCB
-documents embed every symbol and footprint, so the project opens without it.
+`shared_lib` no se publica en este repositorio (licencia no confirmada). Los documentos de esquemático y PCB
+incluyen todos los símbolos y huellas, así que el proyecto abre sin ella.
 
 ## PCB
 
-- Stack-up: FR-4, 1.6 mm, 1 oz copper on both layers.
-- GND polygon pours on Top and Bottom, stitched with vias.
-- ESP32-S3 antenna placed outside the board edge, as indicated by the instructor.
-- Four M3 non-plated mounting holes (3.2 mm). The battery sits under the board.
-- The OLED module is mounted above the board, between the ESP32 and the button cross.
-- Test points (`TPn`): round SMD pads on Top, placed from the schematics on sheets 10 (power rails,
-  GND and ADC dividers), 20 (EN and IO0) and 50 (audio). Excluded from the BOM.
-- Connector silkscreen, for the user: J1 `BATERIA`, J2 `USB-C`, J3 `MICRO SD`, J4 `AUDIO`,
-  J5 `ON/OFF`, J6 `PANTALLA` (OLED, GND–VCC–SCL–SDA) and J7 `UART` (debug, TX = IO43, RX = IO44).
-- Button silkscreen: `VOL+`, `VOL-`, `PLAY/PAUSE`, `PREV`, `NEXT`, plus `BOOT` and reset.
-  The five user buttons share the same circuit (10 kΩ pull-up to an input), so their function is
-  assigned in firmware; see the GPIO map in [MANUAL_CONEXIONES_RevA.md](docs/MANUAL_CONEXIONES_RevA.md), section 3.
-- Logo (dinosaur, ~19.2 × 24.8 mm) on the Bottom Overlay, generated from
-  `altium/MP3_Player/Logos/dino_SXM_25mm_bottom_1px=1mil.bmp` (1 px = 1 mil, already mirrored for
-  the Bottom side). It is drawn as 6 mil (0.152 mm, JLCPCB minimum) silkscreen tracks, one per
-  5-pixel row, grouped into a single union. It sits in the lower-right area of the Bottom side
-  (X 2410–3166 mil, Y 1050–2027 mil), ≥ 12 mil from pads and vias, clear of mask openings, and
-  ≥ 1 mm from the board edge.
+- Apilado: FR-4 de 1.6 mm, cobre de 1 oz en ambas capas.
+- Rellenos de GND en Top y Bottom, unidos con vías.
+- Antena del ESP32-S3 fuera del borde de la placa, como indicó el profesor.
+- Cuatro agujeros de montaje M3 sin metalizar (3.2 mm). La batería va debajo de la placa.
+- El módulo OLED se monta sobre la placa, entre el ESP32 y la cruz de botones.
+- Puntos de prueba (`TPn`): pads SMD redondos en Top, colocados desde los esquemáticos en las hojas 10 (rieles,
+  GND y divisores del ADC), 20 (EN e IO0) y 50 (audio). Fuera de la BOM.
+- Serigrafía de conectores, para el usuario: J1 `BATERIA`, J2 `USB-C`, J3 `MICRO SD`, J4 `AUDIO`,
+  J5 `ON/OFF`, J6 `PANTALLA` (OLED, GND–VCC–SCL–SDA) y J7 `UART` (depuración, TX = IO43, RX = IO44).
+- Serigrafía de botones: `VOL+`, `VOL-`, `PLAY/PAUSE`, `PREV`, `NEXT`, además de `BOOT` y reset.
+  Los cinco botones de usuario tienen el mismo circuito (pull-up de 10 kΩ hacia una entrada), así que su función
+  la asigna el firmware. **En la Rev A los nombres de red de los botones no coinciden con la serigrafía**; la
+  función correcta de cada GPIO está en el [manual de conexiones](docs/MANUAL_CONEXIONES_RevA.md), sección de botones.
+- Logo (dinosaurio, ~19.2 × 24.8 mm) en el Bottom Overlay, generado a partir de
+  `altium/MP3_Player/Logos/dino_SXM_25mm_bottom_1px=1mil.bmp` (1 px = 1 mil, ya reflejado para la cara
+  inferior). Está dibujado con pistas de serigrafía de 6 mil (0.152 mm, mínimo de JLCPCB), una por cada fila de
+  5 píxeles, agrupadas en una sola unión. Está en la zona inferior derecha de la cara Bottom
+  (X 2410–3166 mil, Y 1050–2027 mil), a ≥ 12 mil de pads y vías, fuera de las aberturas de máscara y
+  a ≥ 1 mm del borde.
 
-Main design rules (JLCPCB 2-layer, with margin for hand soldering):
+Reglas de diseño principales (JLCPCB, 2 capas, con margen para soldar a mano):
 
-| Rule | Value |
+| Regla | Valor |
 |---|---|
-| Clearance | 0.20 mm (0.15 mm inside the USB-C footprint only) |
-| Track width | 0.25 mm signals, 0.60 mm power (0.40 mm minimum) |
-| Vias | 0.30 mm hole / 0.60 mm diameter |
-| Board outline clearance | 0.30 mm (0 mm for edge connectors and the ESP32) |
-| Solder mask sliver | 0.10 mm (0.13 mm if black or white mask is ordered) |
-| Silkscreen | 1.0 mm text height, 0.15 mm stroke |
+| Separación | 0.20 mm (0.15 mm solo dentro de la huella del USB-C) |
+| Ancho de pista | 0.25 mm señales, 0.60 mm alimentación (0.40 mm mínimo) |
+| Vías | 0.30 mm de agujero / 0.60 mm de diámetro |
+| Separación al contorno | 0.30 mm (0 mm para conectores de borde y el ESP32) |
+| Franja mínima de máscara | 0.10 mm (0.13 mm si se pide máscara negra o blanca) |
+| Serigrafía | Texto de 1.0 mm de alto, trazo de 0.15 mm |
 
-## Repository layout
+## Estructura de la carpeta
 
 ```text
 hardware/
 ├── README.md
 ├── .gitignore
 ├── altium/
-│   ├── MP3_Player/                 # Altium project: .PrjPcb, 7 .SchDoc sheets, .PcbDoc
-│   │   └── Logos/                  # Bottom Overlay logo bitmap
+│   ├── MP3_Player/                 # Proyecto de Altium: .PrjPcb, 7 hojas .SchDoc, .PcbDoc
+│   │   └── Logos/                  # Mapa de bits del logo del Bottom Overlay
 │   └── libraries/
-│       ├── project/                # Own library MP3_RevA (.SchLib, .PcbLib, .LibPkg)
-│       └── external/               # Course/vendor libraries, ignored by Git
+│       ├── project/                # Librería propia MP3_RevA (.SchLib, .PcbLib, .LibPkg)
+│       └── external/               # Librerías del curso/fabricantes, ignoradas por Git
 ├── outputs/
-│   └── MP3_entregables/            # Release outputs: GERBERS (zip, with DRC report), BOM, DRAFTSMAN (PDF),
-│                                   # 3D (STEP, PDF3D), SHC (schematic PDF)
+│   └── MP3_entregables/            # Salidas de la entrega: GERBERS (zip, con el reporte DRC), BOM, DRAFTSMAN (PDF),
+│                                   # 3D (STEP, PDF3D), SHC (esquemático en PDF)
 └── docs/
-    ├── MANUAL_CONEXIONES_RevA.md   # Connection manual: connectors, GPIO map, blocks, test points
-    ├── WORKFLOW_REV_A.md
-    └── POWER_BUDGET_REV_A.md       # Current budget and battery autonomy estimate
+    ├── MANUAL_CONEXIONES_RevA.md   # Manual de conexiones: conectores, mapa de GPIO, bloques, puntos de prueba
+    ├── WORKFLOW_REV_A.md           # Plan de trabajo de la Rev A
+    └── POWER_BUDGET_REV_A.md       # Presupuesto de corriente y estimado de autonomía
 ```
 
-## Pending
+## Pendientes
 
-- [x] Instructor review of schematics and PCB (2026-11-14, positive)
-- [x] Power budget and battery autonomy estimate: [POWER_BUDGET_REV_A.md](docs/POWER_BUDGET_REV_A.md)
-  (≈ 115 mA in playback, ≈ 7.5 h with a 1000 mAh cell; to be confirmed by measurement)
-- [x] Fabrication outputs under `outputs/MP3_entregables/` (Gerbers + drill, BOM, Draftsman, 3D, schematic PDF)
-- [x] USB D+/D− connected to IO20/IO19 (found unconnected in review; fixed and outputs regenerated on 2026-11-15)
-- [x] Tag `rev-a` and delivery to the instructor (2026-11-15)
-- [x] Connection manual: [MANUAL_CONEXIONES_RevA.md](docs/MANUAL_CONEXIONES_RevA.md)
-- [ ] Confirm battery cable polarity and OLED module pin order before soldering
-- Not planned for Rev A: per-block frames on sheet 60 (sheets 00–50 have them)
+- [x] Revisión de esquemáticos y PCB por el profesor (2026-11-14, positiva)
+- [x] Presupuesto de potencia y autonomía: [POWER_BUDGET_REV_A.md](docs/POWER_BUDGET_REV_A.md)
+  (≈ 115 mA reproduciendo, ≈ 7.5 h con una celda de 1000 mAh; por confirmar con medidas)
+- [x] Salidas de fabricación en `outputs/MP3_entregables/` (Gerbers + taladros, BOM, Draftsman, 3D, esquemático en PDF)
+- [x] USB D+/D− conectados a IO20/IO19 (se encontraron sin conectar en la revisión; corregido y salidas regeneradas el 2026-11-15)
+- [x] Etiqueta `rev-a` y entrega al profesor (2026-11-15)
+- [x] Manual de conexiones: [MANUAL_CONEXIONES_RevA.md](docs/MANUAL_CONEXIONES_RevA.md)
+- [x] Tabla de botones corregida en el manual (redes frente a serigrafía, 2026-11-25)
+- [ ] Confirmar la polaridad del cable de la batería y el orden de pines del módulo OLED antes de soldar
+- No previsto para la Rev A: marcos por bloque en la hoja 60 (las hojas 00–50 sí los tienen)
 
-## Git practice
+## Práctica con Git
 
-Work on `hardware/rev-a-altium` and merge to `main` through pull requests at each milestone.
-Do not modify `poc/` from hardware work. Preserve the original GPLv3 licensing.
+El diseño de la Rev A se hizo en la rama `hardware/rev-a-altium` y se integró a `main` con pull requests en cada
+hito; la etiqueta `rev-a` marca el diseño entregado. Los cambios futuros (Rev B) deben hacerse en una rama nueva
+desde `main`, sin modificar `poc/`, y conservando la licencia GPLv3.

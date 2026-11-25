@@ -1,88 +1,86 @@
-# Portable MP3 Player
+# Reproductor MP3 portátil sin distracciones
 
-**Embedded systems · Electronic design · ESP-IDF · C**
+**Sistemas embebidos · Diseño electrónico · ESP-IDF · C**
 
-A university engineering project exploring a dedicated, offline music player: local audio files, physical controls, and a focused interface without streaming services or smartphone dependency.
+Proyecto del curso de Diseño Electrónico (Universidad Nacional de Colombia, Sede Manizales): un reproductor de música dedicado y sin conexión. Reproduce archivos MP3 desde una microSD, se controla con botones físicos y no depende del celular, de internet ni de servicios de streaming.
 
-> **Status:** firmware proof of concept (PoC) in progress, and custom PCB **Rev A design frozen** (schematics and layout complete with test points, ERC/DRC clean, reviewed by the instructor). On the ESP32-S31-Korvo-1 PoC board, SD storage is validated, WAV and MP3 files play audibly from the microSD card, and the board works as a player with buttons (play/pause, next/previous, limited volume) and an orderly shutdown on a simulated low battery. It also shows the on-screen UI as a virtual 128x64 OLED on the Korvo's LCD (designed for the PCB's SSD1306) and turns the screen off after inactivity. The custom hardware (PCB Rev A) is **not yet validated**.
+> **Estado final (noviembre 2026):**
+> - **PCB Rev A:** diseño congelado y entregado (etiqueta `rev-a`), con ERC sin errores y DRC sin violaciones. **No está fabricada**, así que el hardware propio no está validado.
+> - **Firmware:** validado en una prueba de concepto (PoC) sobre la placa de desarrollo ESP32-S31-Korvo-1. Reproduce MP3 desde la microSD, se controla con botones (play/pausa, siguiente/anterior, volumen con tope), muestra la interfaz de 128×64 y hace un apagado ordenado por batería baja simulada.
 
-## Project goals
+## Documentos principales
 
-- Browse and play music stored on a microSD card.
-- Display basic track information and provide physical button controls.
-- Explore USB mass-storage access and optional Bluetooth connectivity.
-- Design a dedicated, battery-powered hardware platform.
+| Documento | Contenido |
+| --- | --- |
+| **[Nota de aplicación (PDF)](docs/nota-aplicacion/Nota_de_Aplicacion_Reproductor_MP3.pdf)** · [versión Markdown](docs/nota-aplicacion/NOTA_APLICACION.md) | Diseño completo: arquitectura, cálculos de energía y audio, esquemáticos, layout, firmware y resultados de la PoC |
+| **[Pitch del producto (PDF)](docs/pitch/Pitch_Reproductor_MP3.pdf)** | Presentación tipo pitch (necesidad, solución, costo y competencia) |
+| [Manual de conexiones Rev A](hardware/docs/MANUAL_CONEXIONES_RevA.md) | Conectores, mapa de GPIO, botones y puntos de prueba |
+| [Presupuesto de potencia](hardware/docs/POWER_BUDGET_REV_A.md) | Consumo estimado y autonomía de la batería |
+| [Estado de la PoC](poc/esp32-s31-korvo-1/docs/POC_STATUS.md) | Evidencia, logs y límites de la prueba de concepto |
 
-These are **design goals**, not a claim that every feature is implemented.
+## Arquitectura del hardware (PCB Rev A)
 
-## Hardware architecture (PCB Rev A)
+| Bloque | Diseño Rev A |
+| --- | --- |
+| Microcontrolador | ESP32-S3-WROOM-1-N16R8 |
+| Audio | DAC I²S PCM5102A → filtro RC → amplificador de audífonos TPA6138A2 → jack de 3.5 mm |
+| Almacenamiento | microSD por SPI, con detección de tarjeta |
+| Interfaz | Pantalla OLED SSD1306 de 128×64 (I²C) y cinco botones |
+| Energía | Li-Po 1S, cargador TP4056, selección de fuente (AP2301 + Schottky), LDO AP2112K de 3.3 V |
+| USB | USB-C 2.0 (alimentación y datos) con protección ESD USBLC6; USB MSC como trabajo futuro |
 
-| Subsystem | Rev A design | Validation status |
-| --- | --- | --- |
-| Microcontroller | ESP32-S3-WROOM-1-N16R8 | In schematic and layout; not built |
-| Audio | PCM5102A I²S DAC + TPA6138A2 headphone amplifier; 3.5 mm jack | In schematic and layout; not built |
-| Storage | microSD over SPI | In schematic and layout; PoC board uses a different interface |
-| User interface | SSD1306 OLED module and five physical buttons | In schematic and layout; not implemented in firmware |
-| Power | 1S Li-Po, TP4056 charger, load sharing (AP2301), AP2112K 3.3 V LDO | In schematic and layout; power budget pending |
-| USB | USB-C 2.0 (power and data), USBLC6 ESD protection; USB MSC planned | In schematic and layout; firmware pending |
-| Wireless | BM83 Bluetooth module | Deferred; not part of Rev A |
+Placa de 2 capas, 65 × 90.17 mm, pensada para JLCPCB y para soldar a mano. Detalles en **[hardware/README.md](hardware/README.md)**.
 
-Board: 2 layers, 65 × 90.17 mm, designed for JLCPCB and hand soldering. Details in **[hardware/README.md](hardware/README.md)**.
+**Diferencia importante entre plataformas:** la ESP32-S31-Korvo-1 es una placa temporal de prueba. Usa un ESP32-S31, el códec ES8389 y almacenamiento SDMMC. Sus resultados validan el firmware (lógica, formatos, tiempos), **no** la electrónica de la PCB Rev A (ESP32-S3, PCM5102A/TPA6138A2, microSD por SPI).
 
-**Important platform distinction:** The ESP32-S31-Korvo-1 is a temporary PoC board. It uses an ESP32-S31, ES8389 audio codec, and SDMMC storage interface. Results obtained with this board do **not** validate the ESP32-S3, PCM5102A/TPA6138A2, or SPI-based architecture of the custom PCB.
+## Qué está validado
 
-## What exists today
+**En la PoC (ESP32-S31-Korvo-1)**
+- Montaje de la microSD y catálogo ordenado de los `.mp3` de la carpeta `MUSIC` (escenarios SD-01 a SD-07).
+- Reproducción de WAV y MP3 (minimp3): una canción completa de 2:53 sin cortes; decodificación de 2.8 ms en promedio por frame de 24 ms.
+- Reproductor con botones, volumen limitado a −12 dB y secuencia anti-*pop*.
+- Interfaz de 128×64 mostrada como "OLED virtual" en la pantalla de la Korvo, con apagado tras 10 s.
+- Apagado ordenado por batería baja simulada.
+- [Videos de las pruebas](https://drive.google.com/drive/folders/1Tq-jJcRcQZm7ZzIBcm1W4Nzm8Wph00uq?usp=sharing).
 
-**Implemented in the PoC source**
-- SD-card mounting through the Korvo board support package.
-- Discovery, filtering, and deterministic sorting of `.mp3` filenames under `MUSIC`.
-- Audio output through the Korvo BSP route (ES8389 codec, standard I²S).
-- Playback of 16-bit PCM WAV files and MP3 files (minimp3) from the microSD card.
-- A player that ties the `MUSIC` catalog to MP3 playback, driven by the board buttons (play/pause, next/previous, limited volume).
-- Orderly shutdown (mute, close file and codec) triggered by a simulated low battery.
-- UART diagnostic output and explicit error handling.
+**En el computador:** pruebas del catálogo, del lector WAV, del decodificador MP3, del núcleo del reproductor y de la interfaz.
 
-**Evidence available**
-- Host tests covering the catalog, WAV parsing, the MP3 decoder wrapper, and supported sample rates.
-- ESP-IDF firmware-build results for the temporary Korvo target.
-- On the physical ESP32-S31-Korvo-1: SD scenarios SD-01 to SD-07 validated (SD-08 deferred); audible test tone; WAV and MP3 files played from the microSD card, with timing logs.
-- [Test videos on the ESP32-S31-Korvo-1](https://drive.google.com/drive/folders/1Tq-jJcRcQZm7ZzIBcm1W4Nzm8Wph00uq?usp=sharing) (3 videos recorded by the project lead).
+**Sin validar:** la PCB fabricada, el consumo y la autonomía reales, la medición real de la batería, USB MSC y frecuencias de muestreo distintas de 8, 16, 44.1 y 48 kHz en la Korvo (limitación de su códec).
 
-**Not yet demonstrated**
-- Real battery measurement and a real power cut (only a simulated battery and an orderly firmware stop on the Korvo).
-- Sample rates other than 8, 16, 44.1, and 48 kHz on the Korvo (a limitation of its codec setup).
-- USB MSC, Bluetooth, or a fabricated custom PCB (Rev A hardware not validated).
-
-For reproducible evidence and caveats, see the **[PoC status report](poc/esp32-s31-korvo-1/docs/POC_STATUS.md)**. For setup and build instructions, see the **[PoC README](poc/esp32-s31-korvo-1/README.md)**.
-
-## Repository layout
+## Estructura del repositorio
 
 ```text
+docs/
+├── nota-aplicacion/      # Nota de aplicación: PDF, Markdown, imágenes y fuente para regenerarla
+└── pitch/                # Presentación tipo pitch en PDF
 hardware/
 ├── altium/
-│   ├── MP3_Player/   # Altium project: 7 schematic sheets and the PCB
-│   └── libraries/    # Own component library (MP3_RevA)
-└── docs/             # Rev A work plan
+│   ├── MP3_Player/       # Proyecto de Altium: 7 hojas de esquemático y la PCB
+│   └── libraries/        # Librería propia (MP3_RevA)
+├── docs/                 # Manual de conexiones, presupuesto de potencia y plan de trabajo
+└── outputs/
+    └── MP3_entregables/  # Gerbers, BOM, esquemático en PDF, Draftsman y 3D
 poc/
 └── esp32-s31-korvo-1/
-    ├── main/         # PoC firmware and music catalog
-    ├── tests/host/   # Host-side catalog tests
-    ├── docs/         # Status, validation notes, and evidence
-    └── tools/        # PoC-specific development utilities
+    ├── main/             # Firmware de la PoC: núcleo portable y capa de placa
+    ├── tests/host/       # Pruebas que corren en el computador
+    ├── docs/             # Estado, validación y evidencia
+    └── tools/            # Utilidades de desarrollo
 ```
 
-Final-device firmware is **not yet versioned**; it will be added only when the corresponding engineering artifacts exist.
+## Versiones
 
-## Next milestones
+- `rev-a`: diseño de la PCB entregado (15 de noviembre de 2026).
+- `v1.0-entrega-final`: cierre del proyecto con la nota de aplicación y el pitch.
 
-1. ~~Build a player with the catalog and physical buttons on the Korvo (E5)~~.
-2. ~~Simulate a low-battery cutoff on the PoC board (E7)~~.
-3. Next: port the firmware to PCB Rev A (microSD over SPI, PCM5102A).
-4. ~~Complete the target schematic and PCB layout~~ (Rev A frozen and reviewed); ~~power budget~~ ([estimate](hardware/docs/POWER_BUDGET_REV_A.md)); ~~generate fabrication outputs~~ (`hardware/outputs/`).
-5. Fabricate, assemble, and validate the custom PCB separately from the Korvo.
-6. Implement final-device firmware, then assess USB MSC and BM83 integration.
-7. Optional future work: on-demand WiFi upload mode (copy MP3 files to the microSD card from a browser).
+## Trabajo futuro
 
-## License
+1. Fabricar y ensamblar la Rev A, y hacer el primer encendido con los puntos de prueba.
+2. Escribir la capa de placa del ESP32-S3: microSD por SPI, PCM5102A con `XSMT` y `AMP_MUTE_N`, cinco botones (según la tabla de la nota de aplicación, sección 3.6), SSD1306 y lectura real de la batería.
+3. Medir consumo, autonomía y temperatura del regulador.
+4. Transferir canciones por USB (MSC); opcionalmente, por Wi-Fi.
+5. Rev B: renombrar las redes de los botones para que coincidan con la serigrafía.
 
-Licensed under the **GNU General Public License v3.0**. See [LICENSE](LICENSE).
+## Licencia
+
+GPLv3. Ver [LICENSE](LICENSE).

@@ -1,0 +1,63 @@
+body { font-family: Arial, "Liberation Sans", Helvetica, sans-serif; font-size: 9pt; line-height: 1.32; color: #000; counter-reset: fig tab; }
+a { color: #0b54a5; text-decoration: none; }
+
+/* Portada */
+.cover { page-break-after: always; }
+.doclabel { font-size: 13pt; font-weight: bold; font-style: italic; }
+.covertitle { font-size: 16.5pt; font-weight: bold; font-style: italic; line-height: 1.2; margin-top: 2px; }
+.coverrule { border-top: 2px solid #000; margin: 10px 0 14px; }
+.cols { display: flex; gap: 22px; }
+.col { flex: 1; }
+.cover h3 { font-size: 10pt; font-weight: bold; margin: 10px 0 4px; }
+.cover p { margin: 0 0 6px; text-align: left; }
+.cover ul { padding-left: 14px; margin: 0; }
+.cover table { counter-increment: none; width: 100%; font-size: 8.5pt; border: none; margin: 0; }
+.cover table th { display: none; }
+.cover table td { border: none; padding: 1px 0; color: #0b54a5; }
+.cover table td:last-child { color: #000; }
+.coverfigs { display: flex; gap: 18px; align-items: center; margin-top: 18px; }
+.coverfigs img:first-child { width: 58%; }
+.coverfigs img:last-child { width: 30%; }
+
+/* Contenido */
+.toc { page-break-after: always; }
+.toc h1.tochead { font-size: 12pt; margin: 0 0 10px; }
+.toc ul { list-style: none; padding: 0; margin: 0; }
+.toc li { padding: 2px 0; border-bottom: 0.5px dotted #999; }
+.toc li.l1 { font-weight: bold; margin-top: 4px; }
+.toc li.l2 { padding-left: 24px; }
+.toc a { color: #000; }
+
+/* Cuerpo */
+main { margin-left: 0; }
+main > p, main > ul, main > ol, main > table, main > figure, main > blockquote, main > div, main > math { margin-left: 34px; }
+h1 { font-size: 11.5pt; font-weight: bold; margin: 18px 0 8px; page-break-after: avoid; }
+h2 { font-size: 10pt; font-weight: bold; font-style: italic; margin: 14px 0 6px; page-break-after: avoid; }
+h3 { font-size: 9.5pt; font-weight: bold; margin: 10px 0 4px; }
+p { margin: 0 0 7px; }
+ul { padding-left: 16px; margin: 0 0 7px; }
+ul li { list-style-type: square; margin: 1px 0; }
+ol { padding-left: 18px; margin: 0 0 7px; }
+code { font-family: "Courier New", "Liberation Mono", monospace; font-size: 8.6pt; }
+
+/* Tablas al estilo de hoja técnica */
+table { border-collapse: collapse; width: calc(100% - 34px); font-size: 8pt; margin-top: 4px; margin-bottom: 12px; counter-increment: tab; }
+table caption { caption-side: top; font-weight: bold; font-size: 9pt; padding-bottom: 5px; text-align: center; }
+table caption::before { content: "Tabla " counter(tab) ". "; }
+th { font-weight: bold; text-align: left; text-transform: uppercase; font-size: 7.6pt; border-bottom: 1px solid #000; }
+th, td { border: 0.5px solid #000; padding: 2px 5px; vertical-align: top; }
+tr { page-break-inside: avoid; }
+
+/* Figuras: leyenda arriba, como en las guías de referencia */
+figure { display: flex; flex-direction: column-reverse; align-items: center; margin: 10px 0 12px 34px; page-break-inside: avoid; counter-increment: fig; }
+figure img { max-width: 100%; max-height: 120mm; }
+figcaption { font-weight: bold; font-size: 9pt; text-align: center; margin-bottom: 6px; }
+figcaption::before { content: "Figura " counter(fig) ". "; }
+
+/* Notas */
+blockquote { border-top: 0.75px solid #000; border-bottom: 0.75px solid #000; margin: 8px 0 10px 34px; padding: 5px 0 5px 0; font-size: 8.5pt; }
+blockquote p { margin: 0; }
+
+math[display="block"] { margin: 6px 0; font-size: 10pt; }
+figure:has(img[src$="layout_2d.png"]) { page-break-before: always; }
+figure img[src$="layout_2d.png"] { max-height: 222mm; }
