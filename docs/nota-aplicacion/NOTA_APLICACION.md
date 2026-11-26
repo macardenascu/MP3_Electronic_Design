@@ -320,7 +320,7 @@ Los archivos fuente y de fabricación están en el repositorio del proyecto, htt
 
 - Esquemático completo en PDF: `hardware/outputs/MP3_entregables/SHC/SCH.pdf`
 - Lista de materiales: `hardware/outputs/MP3_entregables/BOM/BOM.xlsx`
-- Proyecto de Altium Designer: carpeta `hardware/` (rama `hardware/rev-a-altium`, etiqueta `rev-a`)
+- Proyecto de Altium Designer: carpeta `hardware/` (versión entregada: etiqueta `rev-a`)
 - Manual de conexiones: `hardware/docs/MANUAL_CONEXIONES_RevA.md`
 
 ## 6.2 Lista de materiales

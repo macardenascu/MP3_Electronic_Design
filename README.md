@@ -74,6 +74,7 @@ poc/
 
 - `rev-a`: diseño de la PCB entregado (15 de noviembre de 2026).
 - `v1.0-entrega-final`: cierre del proyecto con la nota de aplicación y el pitch.
+- `v1.1-presentacion-final`: presentación final de 6 minutos y enlace público a los videos de la PoC.
 
 ## Trabajo futuro
 
