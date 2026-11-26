@@ -4,23 +4,38 @@
 
 3 videos de pruebas en la ESP32-S31-Korvo-1 grabados por el responsable: [enlace público](https://drive.google.com/drive/folders/17f_VWlQ8yTDR5UOtKaLUpxXInd0uO0in?usp=drive_link) · [enlace institucional](https://drive.google.com/drive/folders/1Tq-jJcRcQZm7ZzIBcm1W4Nzm8Wph00uq?usp=sharing) (requiere cuenta @unal.edu.co)
 
-## Alcance
+## Resumen de resultados
 
-Esta etapa valida el montaje microSD y el inventario inmediato de archivos MP3 en `MUSIC` mediante el BSP de la Korvo. No implementa reproducción. El hardware de prueba usa ESP32-S31, ES8389 y SDMMC; el producto objetivo ESP32-S3, DAC PCM5102A + amplificador de audífonos TPA6138A2 y microSD SPI requiere validación independiente.
+| Etapa | Qué se validó | Resultado | Detalle |
+|---|---|---|---|
+| E1 | Montaje de la microSD y catálogo de `MUSIC` (escenarios SD-01 a SD-07) | PASS en placa (SD-08 aplazada) | [E1](#e1--almacenamiento-microsd-registro-de-la-etapa) y [SD_VALIDATION.md](SD_VALIDATION.md) |
+| E2 | Regresión de almacenamiento y tono por la ruta de audio del BSP | PASS en placa | [E2](#e2--salida-de-audio-ruta-bsp) |
+| E3 | Reproducción WAV de 16 bits desde la microSD | PASS en placa | [E3](#e3--reproducción-wav-desde-microsd-ruta-bsp) |
+| E4 | Reproducción MP3 con minimp3 (8, 16, 44.1 y 48 kHz) | PASS en placa | [E4](#e4--reproducción-mp3-con-minimp3-ruta-bsp) |
+| E5/E7 | Reproductor con botones, volumen con tope y corte por batería simulada | PASS en placa | [E5/E7](#e5e7--reproductor-con-catálogo-botones-y-corte-por-batería-simulado) |
+| E6/E8 | Interfaz de 128×64 (OLED virtual) y apagado de pantalla | PASS en placa | [E6/E8](#e6e8--interfaz-oled-virtual-128x64-y-ahorro-de-energía) |
+
+Esta PoC valida el firmware (lógica, formatos, tiempos y protocolos) en la ESP32-S31-Korvo-1. **No valida la electrónica de la PCB Rev A**, que aún no está fabricada. Las secciones siguientes conservan el registro de cada etapa en orden cronológico.
+
+## E1 — Almacenamiento microSD (registro de la etapa)
+
+### Alcance de E1
+
+Esta etapa valida el montaje microSD y el inventario inmediato de archivos MP3 en `MUSIC` mediante el BSP de la Korvo. En esa etapa todavía no se implementaba la reproducción (llegó en E3 y E4). El hardware de prueba usa ESP32-S31, ES8389 y SDMMC; el producto objetivo ESP32-S3, DAC PCM5102A + amplificador de audífonos TPA6138A2 y microSD SPI requiere validación independiente.
 
 El catálogo portable acepta `.mp3` sin distinguir mayúsculas ASCII, ignora directorios y otros archivos, comprueba el acceso de lectura, ordena determinísticamente y admite 256 entradas con nombres de hasta 255 bytes. Ese máximo del catálogo se mide en bytes; `FATFS_MAX_LFN=255` es el límite de caracteres configurado en FATFS y no amplía el búfer del catálogo.
 
-## Evidencia separada por tipo
+### Evidencia separada por tipo
 
-### Pruebas host anteriores
+#### Pruebas host anteriores
 
 Las pruebas host compilan `music_catalog.c` con GCC C11 y un shim de `esp_err.h`. Cubren `MUSIC` inexistente o no-directorio, directorio vacío, extensiones `.mp3` mixtas, archivos ajenos, subdirectorios, ordenamiento, nombre largo, capacidad 256 y rechazo de 257. En esta actualización se añade una falla inyectada de `opendir()` después de que `stat()` confirmó el directorio. Verificación actual: GCC C11 con `-Wall -Wextra -Werror`; resultado `music_catalog tests passed`.
 
-### Compilaciones ESP-IDF anteriores
+#### Compilaciones ESP-IDF anteriores
 
 Se conserva como antecedente la compilación registrada de ESP-IDF 6.1 en modo preview, target `esp32s31`, BSP `espressif/esp32_s31_korvo_1` 1.0.1 y GCC RISC-V 15.2.0: 2153/2153 pasos, binario de aplicación de 319360 bytes (`0x4df80`) y aproximadamente 70 % libre en la partición de aplicación. Es evidencia histórica, no una compilación posterior a los cambios de esta actualización.
 
-### Pruebas físicas sobre la placa
+#### Pruebas físicas sobre la placa
 
 El usuario ejecutó el firmware en una ESP32-S31-Korvo-1 V1.1 con microSD insertada. El registro entregado confirma montaje en `/sdcard`, directorio `MUSIC` detectado y tres archivos MP3 listados alfabéticamente. Se conserva el fragmento original:
 
@@ -44,19 +59,19 @@ Esto valida SD-01 para ese caso concreto. También se recibieron resultados post
 
 SD-08 (extensiones `.mp3`, `.MP3`, `.Mp3`) queda aplazada por decisión del responsable del proyecto; no es PASS físico. La comparación case-insensitive tiene cobertura host. La advertencia de nombres largos está presente en el primer log. No se dispone del log de la ejecución SD-07 posterior para confirmar si la advertencia desapareció; esto queda como verificación pendiente y no invalida el resultado funcional del nombre largo reportado.
 
-### Verificación de configuración LFN para este cambio
+#### Verificación de configuración LFN para este cambio
 
 Se inspeccionó `C:\Espressif\v6.1\esp-idf\components\fatfs\Kconfig` de la instalación ESP-IDF 6.1. Allí `FATFS_LFN_HEAP` es una opción oficial de `FATFS_LONG_FILENAMES` («Long filename buffer in heap»). `FATFS_MAX_LFN` depende de que LFN no esté deshabilitado, tiene rango 12–255 y valor predeterminado 255. `sdkconfig.defaults` mantiene el target `CONFIG_IDF_TARGET="esp32s31"` y fija heap y 255. La configuración efectiva disponible en `sdkconfig` y `build_hw_sd/config/sdkconfig.h` también muestra `CONFIG_FATFS_LFN_HEAP=y` y `CONFIG_FATFS_MAX_LFN=255`. La configuración generada confirma esas opciones, pero no se pudo asociar al firmware de la ejecución SD-07 ni comprobar si la advertencia desapareció.
 
-### Compilación actual de firmware
+#### Compilación de firmware en esa etapa
 
-No se pudo iniciar un build nuevo. La activación de la instalación local ESP-IDF 6.1 falla antes de CMake porque falta la herramienta `esp-clangd` (`Tool esp-clangd not found`, WinError 2). No se instaló ni modificó ninguna herramienta global. Por tanto, los valores de `sdkconfig.defaults` se contrastaron con el Kconfig instalado, pero aún no se verificó el `sdkconfig` resultante de un build limpio ni se generó firmware actualizado.
+En el momento de E1 no se pudo iniciar un build nuevo (resuelto después: ver Estado y límites). La activación de la instalación local ESP-IDF 6.1 falla antes de CMake porque falta la herramienta `esp-clangd` (`Tool esp-clangd not found`, WinError 2). No se instaló ni modificó ninguna herramienta global. Por tanto, los valores de `sdkconfig.defaults` se contrastaron con el Kconfig instalado, pero aún no se verificó el `sdkconfig` resultante de un build limpio ni se generó firmware actualizado.
 
-### Pruebas físicas pendientes
+#### Pruebas físicas pendientes en esa etapa
 
 La matriz y los tipos de evidencia por escenario están en [SD_VALIDATION.md](SD_VALIDATION.md). El hito de almacenamiento se acepta y cierra dentro del alcance probado SD-01 a SD-07, con SD-08 expresamente aplazada y sin PASS físico. La ausencia del warning LFN en la ejecución posterior sigue pendiente de evidencia.
 
-## Corrección del contrato del catálogo
+### Corrección del contrato del catálogo
 
 El contrato documentado es que cualquier error deja el catálogo en cero. Antes, `directory_found` se marcaba tras `stat()` y antes de `opendir()`, con lo que el error de apertura dejaba metadatos parciales. Ahora se marca solo tras abrir correctamente. La prueba host inyecta una falla de apertura para probar el caso de forma determinista; no depende de permisos del usuario del sistema operativo.
 

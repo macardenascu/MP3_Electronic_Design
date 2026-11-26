@@ -113,6 +113,6 @@ hardware/
 
 ## Práctica con Git
 
-El diseño de la Rev A se hizo en la rama `hardware/rev-a-altium` y se integró a `main` con pull requests en cada
-hito; la etiqueta `rev-a` marca el diseño entregado. Los cambios futuros (Rev B) deben hacerse en una rama nueva
+El diseño de la Rev A se hizo en la rama `hardware/rev-a-altium` (ya eliminada; todo su contenido está en `main`) y se
+integró a `main` con pull requests en cada hito; la etiqueta `rev-a` marca el diseño entregado. Los cambios futuros (Rev B) deben hacerse en una rama nueva
 desde `main`, sin modificar `poc/`, y conservando la licencia GPLv3.

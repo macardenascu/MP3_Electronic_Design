@@ -1,4 +1,4 @@
-# Altium generated caches, recovery data, and local state
+# Altium: cachés generadas, datos de recuperación y estado local
 **/History/
 **/Project Logs for */
 **/__Previews/
@@ -15,10 +15,10 @@ outputs/MP3_entregables.zip
 outputs/MP3_entregables/ALTIUM/
 altium/MP3_Player/Project_Outputs_for_MP3_Player/
 
-# Instructor/vendor libraries: do not redistribute before checking license.
+# Librerías del profesor o de fabricantes: no redistribuir sin revisar la licencia.
 altium/libraries/external/
-# Legacy local location retained while Altium has the source library open.
+# Ubicación local antigua, conservada mientras Altium tenga abierta la librería fuente.
 altium/librerias/
 
-# Deliberately TRACK native .PrjPcb/.SchDoc/.PcbDoc and owned .SchLib/.PcbLib.
-# Do not blanket-ignore manufacturing outputs; curate them for release.
+# Se versionan a propósito los .PrjPcb/.SchDoc/.PcbDoc nativos y las .SchLib/.PcbLib propias.
+# No ignorar en bloque las salidas de fabricación; se seleccionan para cada entrega.
