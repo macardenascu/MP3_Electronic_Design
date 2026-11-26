@@ -59,6 +59,7 @@ Placa de 2 capas, 65 × 90.17 mm, pensada para JLCPCB y para soldar a mano. Deta
 
 ```text
 docs/
+├── img/                  # Renders 3D de la PCB que se muestran en este README
 ├── nota-aplicacion/      # Nota de aplicación: PDF, Markdown, imágenes y fuente para regenerarla
 ├── presentacion/         # Presentación final (6 minutos) en PDF
 └── pitch/                # Presentación tipo pitch en PDF
