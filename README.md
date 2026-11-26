@@ -3,9 +3,9 @@
 **Sistemas embebidos · Diseño electrónico · ESP-IDF · C**
 
 <p align="center">
-  <img src="docs/nota-aplicacion/img/pcb_3d_top.png" alt="Render 3D de la PCB Rev A, cara superior" height="420">
+  <img src="docs/img/pcb_3d_top.png" alt="Render 3D de la PCB Rev A, cara superior" height="420">
   &nbsp;&nbsp;
-  <img src="docs/nota-aplicacion/img/pcb_3d_bottom.png" alt="Render 3D de la PCB Rev A, cara inferior" height="420">
+  <img src="docs/img/pcb_3d_bottom.png" alt="Render 3D de la PCB Rev A, cara inferior" height="420">
 </p>
 <p align="center"><i>PCB Rev A: renders 3D de Altium Designer, cara superior e inferior (la placa aún no está fabricada).</i></p>
 
