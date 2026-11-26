@@ -2,7 +2,7 @@
 
 ## Evidencia en video
 
-[3 videos de pruebas en la ESP32-S31-Korvo-1 grabados por el responsable](https://drive.google.com/drive/folders/1Tq-jJcRcQZm7ZzIBcm1W4Nzm8Wph00uq?usp=sharing)
+3 videos de pruebas en la ESP32-S31-Korvo-1 grabados por el responsable: [enlace público](https://drive.google.com/drive/folders/17f_VWlQ8yTDR5UOtKaLUpxXInd0uO0in?usp=drive_link) · [enlace institucional](https://drive.google.com/drive/folders/1Tq-jJcRcQZm7ZzIBcm1W4Nzm8Wph00uq?usp=sharing) (requiere cuenta @unal.edu.co)
 
 ## Alcance
 
